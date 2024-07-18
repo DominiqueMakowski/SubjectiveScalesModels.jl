@@ -1,5 +1,12 @@
+"""
+    SubjectiveScaleModels
+
+"""
 module SubjectiveScaleModels
 
-# Write your package code here.
+
+export BetaMuPhi
+
+include("BetaMuPhi.jl")
 
 end
