@@ -73,6 +73,6 @@ jobs:
               shell: julia --project=docs --color=yes {0}
               run: |
                   using Documenter: DocMeta, doctest
-                  using SubjectiveScaleModels
-                  DocMeta.setdocmeta!(SubjectiveScaleModels, :DocTestSetup, :(using SubjectiveScaleModels); recursive=true)
-                  doctest(SubjectiveScaleModels)
+                  using SubjectiveScalesModels
+                  DocMeta.setdocmeta!(SubjectiveScalesModels, :DocTestSetup, :(using SubjectiveScalesModels); recursive=true)
+                  doctest(SubjectiveScalesModels)

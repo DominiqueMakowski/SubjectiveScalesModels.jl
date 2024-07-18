@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = SubjectiveScaleModels
+CurrentModule = SubjectiveScalesModels
 ```
 
-# SubjectiveScaleModels
+# SubjectiveScalesModels
 
-Documentation for [SubjectiveScaleModels](https://github.com/DominiqueMakowski/SubjectiveScaleModels.jl).
+Documentation for [SubjectiveScalesModels](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [SubjectiveScaleModels]
+Modules = [SubjectiveScalesModels]
 ```

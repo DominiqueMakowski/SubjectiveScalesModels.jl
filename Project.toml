@@ -1,4 +1,4 @@
-name = "SubjectiveScaleModels"
+name = "SubjectiveScalesModels"
 uuid = "da3460ee-0a2f-4d2a-8d76-316f36bde5da"
 authors = ["Dominique Makowski"]
 version = "1.0.0-DEV"

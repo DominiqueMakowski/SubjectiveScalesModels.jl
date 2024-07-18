@@ -4,7 +4,7 @@ using Pkg
 Pkg.activate("C:/Users/domma/Dropbox/Software/SubjectiveScalesModels.jl/")
 
 using Distributions
-using SubjectiveScaleModels
+using SubjectiveScalesModels
 using GLMakie
 
 d = BetaMuPhi(0.5, 2.0)

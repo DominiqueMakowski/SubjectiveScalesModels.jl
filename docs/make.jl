@@ -1,14 +1,14 @@
-using SubjectiveScaleModels
+using SubjectiveScalesModels
 using Documenter
 
-DocMeta.setdocmeta!(SubjectiveScaleModels, :DocTestSetup, :(using SubjectiveScaleModels); recursive=true)
+DocMeta.setdocmeta!(SubjectiveScalesModels, :DocTestSetup, :(using SubjectiveScalesModels); recursive=true)
 
 makedocs(;
-    modules=[SubjectiveScaleModels],
+    modules=[SubjectiveScalesModels],
     authors="Dominique Makowski",
-    sitename="SubjectiveScaleModels.jl",
+    sitename="SubjectiveScalesModels.jl",
     format=Documenter.HTML(;
-        canonical="https://DominiqueMakowski.github.io/SubjectiveScaleModels.jl",
+        canonical="https://DominiqueMakowski.github.io/SubjectiveScalesModels.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/DominiqueMakowski/SubjectiveScaleModels.jl",
+    repo="github.com/DominiqueMakowski/SubjectiveScalesModels.jl",
     devbranch="main",
 )

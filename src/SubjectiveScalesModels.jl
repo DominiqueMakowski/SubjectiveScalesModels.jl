@@ -1,8 +1,8 @@
 """
-    SubjectiveScaleModels
+    SubjectiveScalesModels
 
 """
-module SubjectiveScaleModels
+module SubjectiveScalesModels
 
 
 export BetaMuPhi
