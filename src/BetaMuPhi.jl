@@ -20,6 +20,6 @@ julia> BetaMuPhi(0.5, 2)
 Distributions.Beta{Float64}(α=1.0, β=1.0)
 ```
 """
-function BetaMuPhi(μ::T, ϕ::T) where {T<:Number}
+function BetaMuPhi(μ::Real, ϕ::Real)
     return Beta(μ * ϕ, (1 - μ) * ϕ)
 end

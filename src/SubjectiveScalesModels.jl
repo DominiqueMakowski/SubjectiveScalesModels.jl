@@ -5,10 +5,12 @@
 module SubjectiveScalesModels
 
 
-export BetaMuPhi
 export data_rescale
+export BetaMuPhi
+export OrderedBeta
 
-include("BetaMuPhi.jl")
 include("data_rescale.jl")
+include("BetaMuPhi.jl")
+include("OrderedBeta.jl")
 
 end

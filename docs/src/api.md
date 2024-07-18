@@ -1,7 +1,7 @@
 # Functions
 
 ```@docs
-BetaMuPhi(μ::T, ϕ::T) where {T<:Number}
+BetaMuPhi(μ::Real, ϕ::Real)
 ```
 
 ```@docs
