@@ -1,5 +1,5 @@
 # Functions
 
 ```@docs
-BetaMuPhi(μ, ϕ)
+BetaMuPhi(μ::Number, ϕ::Number)
 ```
