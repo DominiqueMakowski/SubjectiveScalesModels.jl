@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SubjectiveScaleModels = "da3460ee-0a2f-4d2a-8d76-316f36bde5da"
