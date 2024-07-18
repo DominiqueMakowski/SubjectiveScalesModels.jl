@@ -2,6 +2,9 @@ using Revise
 using Pkg
 
 Pkg.activate("C:/Users/domma/Dropbox/Software/SubjectiveScalesModels.jl/")
+Pkg.activate("C:/Users/dmm56/Dropbox/Software/SubjectiveScalesModels.jl/")
+
+# Pkg.instantiate()
 
 using Distributions
 using SubjectiveScalesModels
