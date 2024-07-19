@@ -1,3 +1,5 @@
+import Base: minimum, maximum
+
 """
     data_rescale(x; old_range=[minimum(x), maximum(x)], new_range=[0, 1])
 

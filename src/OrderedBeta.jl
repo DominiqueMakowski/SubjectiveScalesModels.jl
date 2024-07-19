@@ -17,6 +17,13 @@ The distribution is defined on the interval [0, 1] with additional point masses 
 # Examples
 ```jldoctest
 julia> OrderedBeta(0.5, 2, 0, 1)
+OrderedBeta{Float64}(
+μ: 0.5
+ϕ: 2.0
+cut0: 0.0
+cut1: 1.0
+beta_dist: Beta{Float64}(α=1.0, β=1.0)
+)
 ```
 """
 struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
