@@ -9,7 +9,7 @@ data_rescale(x::Vector{T}; old_range::Vector{T}=[minimum(x), maximum(x)], new_ra
 ```
 
 ```@docs
-OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
+OrderedBeta
 ```
 
 ```@docs
