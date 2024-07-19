@@ -8,7 +8,3 @@ Documentation for [SubjectiveScalesModels](https://github.com/DominiqueMakowski/
 
 ```@index
 ```
-
-```@autodocs
-Modules = [SubjectiveScalesModels]
-```
