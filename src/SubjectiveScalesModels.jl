@@ -6,11 +6,11 @@ module SubjectiveScalesModels
 
 
 export data_rescale
-export BetaMuPhi
+export BetaPhi2
 export OrderedBeta
 
 include("data_rescale.jl")
-include("BetaMuPhi.jl")
+include("BetaPhi2.jl")
 include("OrderedBeta.jl")
 
 end

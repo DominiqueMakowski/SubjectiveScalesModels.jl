@@ -1,7 +1,7 @@
 # Functions
 
 ```@docs
-BetaMuPhi(μ::Real, ϕ::Real)
+BetaPhi2(μ::Real, ϕ::Real)
 ```
 
 ```@docs

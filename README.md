@@ -10,7 +10,7 @@ Toolbox for modelling scores from subjective scales (Likert scales, analog scale
 ## Roadmap
 
 - [ ] Make a Julia package
-- [ ] BetaMuPhi
+- [ ] BetaPhi2
 - [ ] OrderedBeta
 - [ ] ZOIB
 - [ ] Choice-Confidence

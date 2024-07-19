@@ -1,5 +1,5 @@
 import Distributions: Beta, ContinuousUnivariateDistribution
-import Random: rand
+import Random
 
 
 """
