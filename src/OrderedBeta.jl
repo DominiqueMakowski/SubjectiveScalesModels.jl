@@ -1,5 +1,6 @@
 import Distributions: Beta, ContinuousUnivariateDistribution
 import Random
+import StatsBase: sample, Weights
 
 
 """
@@ -26,6 +27,7 @@ k2: 12.0
 beta_dist: Distributions.Beta{Float64}(α=1.0, β=1.0)
 )
 ```
+
 """
 struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
     μ::T
@@ -60,36 +62,42 @@ insupport(::OrderedBeta, x::Real) = 0 ≤ x ≤ 1
 
 
 # Random -------------------------------------------------------------------------------------------
-function _logistic(x::Real)
-    return 1.0 / (1.0 + exp(-x))
-end
+# function _logistic(x::Real)
+#     return 1.0 / (1.0 + exp(-x))
+# end
 
-function _invlogistic(y::Real)
-    if y <= 0 || y >= 1
-        error("Input must be between 0 and 1 (exclusive).")
-    end
-    return log(y / (1.0 - y))
-end
+# function _invlogistic(y::Real)
+#     if y <= 0 || y >= 1
+#         error("Input must be between 0 and 1 (exclusive).")
+#     end
+#     return log(y / (1.0 - y))
+# end
 
-
-
-# k1 = 1
-# _invlogistic(_logistic(k1))
-# k2 = 2 * abs(k1)
-# _logistic(k1 + k2)
 
 # function Random.rand(rng::Random.AbstractRNG, d::OrderedBeta)
 #     μ, ϕ, k1, k2 = params(d)
-#     thresh = [_logistic(k1), _logistic(k1 + k2)]
-#     u = Random.rand(rng)
+#     y = Random.rand(rng)
 
-#     if u <= 1 - (μ - thresh[1])
-#         return zero(μ)
-#     elseif u >= 1 - (μ - thresh[2])
-#         return one(μ)
+#     # Probabilities (eq. 5; Kubinec, 2023)
+#     # -------------------------------------
+#     # P(y=0)
+#     if k1 == 0
+#         α = 0.0
 #     else
-#         return Random.rand(rng, d.beta_dist)
+#         α = _logistic(_invlogistic(k1) - _invlogistic(y))
 #     end
+
+#     # P(y=1)
+#     if k2 == 1
+#         γ = 0.0
+#     else
+#         γ = _logistic(_invlogistic(y) - _invlogistic(k2))
+#     end
+
+#     # P(y in ]0, 1[)
+#     δ = 1 - (α + γ) # P(y in ]0, 1[)
+
+#     return sample([0, 1, Random.rand(rng, d.beta_dist)], Weights([α, γ, δ]))
 # end
 
 # Random.rand(d::OrderedBeta) = rand(Random.GLOBAL_RNG, d)

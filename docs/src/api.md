@@ -12,6 +12,13 @@ BetaPhi2(μ::Real, ϕ::Real)
 OrderedBeta
 ```
 
+
+## ExtremeBeta()
+
+```@docs
+ExtremeBeta
+```
+
 ## Other
 
 ### data_rescale()
