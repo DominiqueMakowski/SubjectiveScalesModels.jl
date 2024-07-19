@@ -6,6 +6,14 @@ import StatsBase: sample, Weights
 """
     ExtremeBeta(μ, ϕ, k0, k1)
 
+This is a modified version of the OrderedBeta model by Kubinec (2023).
+
+# Arguments
+- `μ`: Location parameter (range: \$]0, 1[\$). See [`BetaPhi2`](@ref).
+- `ϕ`: Precision parameter (must be \$> 0\$). See [`BetaPhi2`](@ref).
+
+# Details
+
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_ExtremeBeta.gif?raw=true)
 
 # Examples
