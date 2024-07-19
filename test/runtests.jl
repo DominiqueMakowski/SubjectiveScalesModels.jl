@@ -1,4 +1,4 @@
 using SubjectiveScalesModels
 using Test
 
-include("test_BetaMuPhi.jl")
+include("test_BetaPhi2.jl")
