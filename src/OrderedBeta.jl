@@ -22,7 +22,7 @@ OrderedBeta{Float64}(
 ϕ: 2.0
 cut0: 0.0
 cut1: 1.0
-beta_dist: Beta{Float64}(α=1.0, β=1.0)
+beta_dist: Distributions.Beta{Float64}(α=1.0, β=1.0)
 )
 ```
 """
