@@ -6,6 +6,8 @@
 BetaPhi2(μ::Real, ϕ::Real)
 ```
 
+![](img/animation_BetaPhi2.gif)
+
 ## data_rescale()
 
 ```@docs
