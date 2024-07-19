@@ -6,7 +6,6 @@
 BetaPhi2(μ::Real, ϕ::Real)
 ```
 
-![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
 ## data_rescale()
 
