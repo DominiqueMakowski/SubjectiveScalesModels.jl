@@ -5,6 +5,9 @@ import Base: minimum, maximum
 
 Rescale a variable to a new range. Can be used to normalize a variable between 0 and 1.
 
+!!! danger
+    This function is currently used internally and might be moved to another package. Avoid using it directly.
+
 # Arguments
 - `x`: Vector to rescale.
 - `old_range`: Old range of the vector to rescale (will be taken by default from the minimum and maximum value of `x`).
