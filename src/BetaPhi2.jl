@@ -31,7 +31,7 @@ julia> BetaPhi2(μ=0.7, ϕ=3.0)
 Distributions.Beta{Float64}(α=4.199999999999999, β=1.8000000000000003)
 ```
 """
-function BetaPhi2(; μ::Real=0.5, ϕ::Real=1)
+function BetaPhi2(; μ::Real=0.5, ϕ::Real=1.0)
     return Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ))
 end
 

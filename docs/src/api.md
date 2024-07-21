@@ -1,10 +1,5 @@
 # Functions
 
-## BetaPhi2()
-
-```@docs
-BetaPhi2
-```
 
 ## OrderedBeta()
 
