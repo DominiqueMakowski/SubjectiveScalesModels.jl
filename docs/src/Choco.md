@@ -123,21 +123,21 @@ fig
 ### Specify Turing Model
 
 
-```@example choco1
-# @model function model_choco(y)
-#     p0 ~ Normal(0, 3)
-#     μ0 ~ truncated(Normal(0, 1.5), -10, 10)
-#     μ1 ~ truncated(Normal(0, 1.0), -10, 10)
-#     ϕ0 ~ Normal(0, 1)
-#     ϕ1 ~ Normal(0, 0.8)
+```julia
+@model function model_choco(y)
+    p0 ~ Normal(0, 3)
+    μ0 ~ truncated(Normal(0, 1.5), -10, 10)
+    μ1 ~ truncated(Normal(0, 1.0), -10, 10)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 0.8)
 
-#     for i in 1:length(y)
-#         y[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
-#     end
-# end
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
 
-# fit = model_choco(y)
-# posteriors = sample(fit, NUTS(), 500)
+fit = model_choco(y)
+posteriors = sample(fit, NUTS(), 500)
 ```
 
 !!! tip
