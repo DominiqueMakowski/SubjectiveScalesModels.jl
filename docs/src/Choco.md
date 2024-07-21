@@ -164,8 +164,6 @@ results = DataFrame(
 )
 
 results
-
-rand(Choco(0.5, 0.5, 1.0, 1, 1.0), 1000)
 ```
 
 ## Real Data Example
