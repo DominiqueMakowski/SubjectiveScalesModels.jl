@@ -19,6 +19,7 @@ Let's generate some data from a `Choco()` distribution with known parameters tha
 
 ```@example choco1
 using Random
+using DataFrames
 using SubjectiveScalesModels
 using Turing
 using CairoMakie
@@ -31,9 +32,16 @@ y = rand(Choco(p0=0.3, μ0=0.7, ϕ0=1, μ1=0.3, ϕ1=3.0), 1000)
 hist(y, bins=100, color=:darkred)
 ```
 
-### Specify Turing Model
+### Decide on Priors
 
-#### Priors
+Deciding on priors requires a good understanding of the meaning of the parameters of the [`BetaPhi2`](@ref) distribution on which the Choco model is based.
+
+The parameters of the `Choco()` distribution have the following requirements:
+
+- `p0`, `μ0` and `μ1`: Must be in the interval 0-1.
+- `ϕ0` and `ϕ1`: Must be positive (with a special value at 1 where the distribution is flat when μ is at 0.5).
+
+Because of these specificities, it this convenient to express priors on a different scale (the logit scale for `p0`, `μ0` and `μ1`, and the log scale for `ϕ0` and `ϕ1`) and then transform them using a logistic or exponential link functions.
 
 ```@raw html
 <details><summary>See code</summary>
@@ -109,16 +117,45 @@ fig
 </details>
 ```
 
-```@example choco1
-# @model function model_choco(y)
-#     p0 ~ Beta(10, 10)
-#     μ0 ~ Normal(0, 3)
-#     ϕ0 ~ truncated(Normal(0.1, 1); lower=0)
-#     μ1 ~ Normal(0, 3)
-#     ϕ1 ~ truncated(Normal(0.1, 1); lower=0)
 
-#     for i in 1:length(y)
-#         y[i] ~ Choco(p0, logistic(μ0), ϕ0, logistic(μ1), ϕ1)
-#     end
-# end
+### Specify Turing Model
+
+
+```@example choco1
+@model function model_choco(y)
+    p0 ~ Normal(0, 3)
+    μ0 ~ truncated(Normal(0, 2), -10, 10)
+    μ1 ~ truncated(Normal(0, 1.5), -10, 10)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 0.8)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
+
+fit = model_choco(y)
+chains = sample(fit, NUTS(), 500)
+```
+
+```@example choco1
+posterior_mean = DataFrame(mean(chains))
+
+# Format
+results = DataFrame(
+    Parameter = posterior_mean.parameters,
+    Posterior_Mean = round.(posterior_mean.mean; digits=2),
+    Estimate = round.([
+        logistic(posterior_mean.mean[1]), 
+        logistic(posterior_mean.mean[2]),
+        exp(posterior_mean.mean[3]),
+        logistic(posterior_mean.mean[4]),
+        exp(posterior_mean.mean[5])
+        ]; digits=2),
+    Truth = [0.3, 0.7, 1, 0.3, 3]
+)
+
+results
+
+rand(Choco(0.5, 0.5, 1.0, 1, 1.0), 1000)
 ```

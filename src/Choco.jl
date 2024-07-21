@@ -9,17 +9,17 @@ Construct a Choice-Confidence (Choco) model distribution.
 # Examples
 ```jldoctest
 julia> Choco(p0=0.5, μ0=0.7, ϕ0=2, μ1=0.7, ϕ1=2)
-MixtureModel{LocationScale{Float64, Continuous, Beta{Float64}}}(K = 2)
-components[1] (prior = 0.5000): LocationScale{Float64, Continuous, Beta{Float64}}(
+MixtureModel{Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}}(K = 2)
+components[1] (prior = 0.5000): Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
 μ: 0.5
 σ: -0.5
-ρ: Beta{Float64}(α=2.8, β=1.2000000000000002)
+ρ: Distributions.Beta{Float64}(α=2.8, β=1.2000000000000002)
 )
 
-components[2] (prior = 0.5000): LocationScale{Float64, Continuous, Beta{Float64}}(
+components[2] (prior = 0.5000): Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
 μ: 0.5
 σ: 0.5
-ρ: Beta{Float64}(α=2.8, β=1.2000000000000002)
+ρ: Distributions.Beta{Float64}(α=2.8, β=1.2000000000000002)
 )
 ```
 """
