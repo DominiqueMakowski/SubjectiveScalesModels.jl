@@ -112,10 +112,36 @@ ax6 = Axis(fig[3, 2],
 vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
 lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0")
 lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1")
-xlims!(ax6, 0, 10)
-fig
+xlims!(ax6, 0, 10);
 ```
 ```@raw html
 </details>
 ```
+
+```@example choco1
+fig  # hide
+```
+
+### Specify Turing Model
+
+
+```@example choco1
+@model function model_choco(y)
+    p0 ~ Normal(0, 3)
+    μ0 ~ truncated(Normal(0, 1.5), -10, 10)
+    μ1 ~ truncated(Normal(0, 1.0), -10, 10)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 0.8)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
+
+# fit = model_choco(y)
+# posteriors = sample(fit, NUTS(), 500);
+```
+
+!!! tip
+    It can be useful to truncate the priors for $\mu$ to avoid the model to explore regions to close to the boundaries 0 and 1 (after transformation), as it might lead to convergence errors
 

@@ -81,10 +81,13 @@ ax4 = Axis(fig[2, 2],
     yticklabelsvisible=false)
 vlines!(ax4, [1], color=:black, linestyle=:dash, linewidth=1)
 lines!(ax4, exp.(xaxis1), pdf.(ϕ, xaxis1), color=:green, linewidth=2, label="ϕ")
-xlims!(ax4, -0.5, 15)
-fig
+xlims!(ax4, -0.5, 15);
 ```
 ```@raw html
 </details>
 ```
 
+
+```@example betaphi1
+fig  # hide
+```
