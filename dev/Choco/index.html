@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Choco · SubjectiveScalesModels.jl</title><meta name="title" content="Choco · SubjectiveScalesModels.jl"/><meta property="og:title" content="Choco · SubjectiveScalesModels.jl"/><meta property="twitter:title" content="Choco · SubjectiveScalesModels.jl"/><meta name="description" content="Documentation for SubjectiveScalesModels.jl."/><meta property="og:description" content="Documentation for SubjectiveScalesModels.jl."/><meta property="twitter:description" content="Documentation for SubjectiveScalesModels.jl."/><meta property="og:url" content="https://DominiqueMakowski.github.io/SubjectiveScalesModels.jl/Choco/"/><meta property="twitter:url" content="https://DominiqueMakowski.github.io/SubjectiveScalesModels.jl/Choco/"/><link rel="canonical" href="https://DominiqueMakowski.github.io/SubjectiveScalesModels.jl/Choco/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">SubjectiveScalesModels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../BetaPhi2/">BetaPhi2</a></li><li class="is-active"><a class="tocitem" href>Choco</a><ul class="internal"><li><a class="tocitem" href="#Demonstration"><span>Demonstration</span></a></li></ul></li><li><a class="tocitem" href="../api/">Other Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Choco</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Choco</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/src/Choco.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Choco-Model"><a class="docs-heading-anchor" href="#Choco-Model">Choco Model</a><a id="Choco-Model-1"></a><a class="docs-heading-anchor-permalink" href="#Choco-Model" title="Permalink"></a></h1><p>A <strong>Choice-Confidence</strong> scale is a subjective scale in which the left and right halves can be conceptualized as <strong>two different choices</strong> (e.g., True/False, Agree/Disagree, etc.), and the <strong>magnitude</strong> of the response (how much the cursor is placed towards he extremes) as the <strong>confidence</strong> in the corresponding choice.</p><p>This type of data can be modeled using a mixture of two scaled <span>$Beta$</span> distributions expressing the confidence for each choice, each choice occurring with a certain probability.</p><p>The <code>SubjectiveScalesModels.jl</code> package defines the the <code>Choco()</code> function that can be used to generate or model data from choice-confidence scales.</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="SubjectiveScalesModels.Choco" href="#SubjectiveScalesModels.Choco"><code>SubjectiveScalesModels.Choco</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">Choco(p0, μ0, ϕ0, μ1, ϕ1)</code></pre><p>Construct a Choice-Confidence (Choco) model distribution.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; Choco(p0=0.5, μ0=0.7, ϕ0=2, μ1=0.7, ϕ1=2)
+MixtureModel{Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}}(K = 2)
+components[1] (prior = 0.5000): Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
+μ: 0.5
+σ: -0.5
+ρ: Distributions.Beta{Float64}(α=2.8, β=1.2000000000000002)
+)
+
+components[2] (prior = 0.5000): Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
+μ: 0.5
+σ: 0.5
+ρ: Distributions.Beta{Float64}(α=2.8, β=1.2000000000000002)
+)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/2c5e671e686117bb07955b31c129c8ba820a1c05/src/Choco.jl#L3-L25">source</a></section></article><h2 id="Demonstration"><a class="docs-heading-anchor" href="#Demonstration">Demonstration</a><a id="Demonstration-1"></a><a class="docs-heading-anchor-permalink" href="#Demonstration" title="Permalink"></a></h2><h3 id="Generate-Data"><a class="docs-heading-anchor" href="#Generate-Data">Generate Data</a><a id="Generate-Data-1"></a><a class="docs-heading-anchor-permalink" href="#Generate-Data" title="Permalink"></a></h3><p>Let&#39;s generate some data from a <code>Choco()</code> distribution with known parameters that we are going to try to recover using Bayesian modelling.</p><pre><code class="language-julia hljs">using DataFrames
+using Random
+using Turing
+using CairoMakie
+using StatsFuns: logistic
+using SubjectiveScalesModels</code></pre><pre><code class="language-julia hljs">Random.seed!(123)
+
+y = rand(Choco(p0=0.3, μ0=0.7, ϕ0=1, μ1=0.3, ϕ1=3.0), 1000)
+
+hist(y, bins=100, color=:darkred)</code></pre><img src="4f27f7c7.png" alt="Example block output"/><h3 id="Decide-on-Priors"><a class="docs-heading-anchor" href="#Decide-on-Priors">Decide on Priors</a><a id="Decide-on-Priors-1"></a><a class="docs-heading-anchor-permalink" href="#Decide-on-Priors" title="Permalink"></a></h3><p>Deciding on priors requires a good understanding of the meaning of the parameters of the <a href="../BetaPhi2/#BetaPhi2"><code>BetaPhi2</code></a> distribution on which the Choco model is based.</p><p>The parameters of the <code>Choco()</code> distribution have the following requirements:</p><ul><li><code>p0</code>, <code>μ0</code> and <code>μ1</code>: Must be in the interval 0-1.</li><li><code>ϕ0</code> and <code>ϕ1</code>: Must be positive (with a special value at 1 where the distribution is flat when μ is at 0.5).</li></ul><p>Because of these specificities, it this convenient to express priors on a different scale (the logit scale for <code>p0</code>, <code>μ0</code> and <code>μ1</code>, and the log scale for <code>ϕ0</code> and <code>ϕ1</code>) and then transform them using a logistic or exponential link functions.</p><details><summary>See code</summary><pre><code class="language-julia hljs">fig =  Figure(size = (1000, 700))
+ax1 = Axis(fig[1, 1],
+    xlabel=&quot;Prior on the logit scale&quot;,
+    ylabel=&quot;Distribution&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+
+p0 =  Normal(0, 3)
+μ0 = Normal(0, 1.5)
+μ1 = Normal(0, 1.0)
+ϕ0 = Normal(0, 1.0)
+ϕ1 = Normal(0, 0.8)
+
+xaxis1 = range(-10, 10, 1000)
+
+lines!(ax1, xaxis1, pdf.(p0, xaxis1), color=:purple, linewidth=2, label=&quot;p0 ~ Normal(0, 3)&quot;)
+axislegend(ax1; position=:rt)
+
+ax2 = Axis(fig[1, 2],
+    xlabel=&quot;Prior after logistic transformation&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax2, logistic.(xaxis1), pdf.(p0, xaxis1), color=:purple, linewidth=2, label=&quot;p0&quot;)
+
+ax3 = Axis(fig[2, 1],
+    xlabel=&quot;Prior on the logit scale&quot;,
+    ylabel=&quot;Distribution&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label=&quot;μ0 ~ Normal(0, 1.5)&quot;)
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label=&quot;μ1 ~ Normal(0, 1.0)&quot;)
+axislegend(ax3; position=:rt)
+
+ax4 = Axis(fig[2, 2],
+    xlabel=&quot;Prior after logistic transformation&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax4, logistic.(xaxis1), pdf.(μ0, xaxis1), color=:blue, linewidth=2, label=&quot;μ0&quot;)
+lines!(ax4, logistic.(xaxis1), pdf.(μ1, xaxis1), color=:red, linewidth=2, label=&quot;μ1&quot;)
+
+ax5 = Axis(fig[3, 1],
+    xlabel=&quot;Prior on the log scale&quot;,
+    ylabel=&quot;Distribution&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label=&quot;ϕ0 ~ Normal(0, 1)&quot;)
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label=&quot;ϕ1 ~ Normal(0, 0.8)&quot;)
+axislegend(ax5; position=:rt)
+
+ax6 = Axis(fig[3, 2],
+    xlabel=&quot;Prior after exponential transformation&quot;,
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label=&quot;ϕ0&quot;)
+lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label=&quot;ϕ1&quot;)
+xlims!(ax6, 0, 10)
+fig</code></pre><img src="013902b8.png" alt="Example block output"/></details></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../BetaPhi2/">« BetaPhi2</a><a class="docs-footer-nextpage" href="../api/">Other Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Sunday 21 July 2024 20:02">Sunday 21 July 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
