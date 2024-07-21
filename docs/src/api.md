@@ -19,6 +19,13 @@ OrderedBeta
 ExtremeBeta
 ```
 
+
+## Choco()
+
+```@docs
+Choco
+```
+
 ## Other
 
 ### data_rescale()

@@ -5,7 +5,8 @@
 [![Coverage](https://codecov.io/gh/DominiqueMakowski/SubjectiveScalesModels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/DominiqueMakowski/SubjectiveScalesModels.jl)
 
 
-Toolbox for modelling scores from subjective scales (Likert scales, analog scales, ...)
+Toolbox for modelling scores from subjective scales (Likert scales, analog scales, ...). 
+This package's functions are demonstrated in the [**Cognitive Models**](https://dominiquemakowski.github.io/CognitiveModels/).
 
 ## Roadmap
 
@@ -14,6 +15,8 @@ Toolbox for modelling scores from subjective scales (Likert scales, analog scale
 - [ ] OrderedBeta
 - [ ] ZOIB
 - [ ] Choice-Confidence
+
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
 ## Features
 

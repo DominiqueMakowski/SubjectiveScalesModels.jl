@@ -1,4 +1,4 @@
-import Distributions: Beta, ContinuousUnivariateDistribution
+using Distributions: Beta, ContinuousUnivariateDistribution
 import Random
 import StatsBase: sample, Weights
 
@@ -74,16 +74,11 @@ function _invlogistic(y::Real)
 end
 
 
-# μ=0.5; ϕ=1; k0=0.01; k1=0.01
-# d = ExtremeBeta(μ, ϕ, k0, k1)
-# y=0.99
-
 function Random.rand(rng::Random.AbstractRNG, d::ExtremeBeta)
     μ, ϕ, k0, k1 = params(d)
     y = Random.rand(rng)
 
     # Compute Probabilities
-    # -------------------------------------
     # P(y=0)
     if k0 == 0
         p0 = 0.0
@@ -109,3 +104,26 @@ Random.rand(rng::Random.AbstractRNG, d::ExtremeBeta, n::Int) = [rand(rng, d) for
 Random.rand(d::ExtremeBeta, n::Int) = rand(Random.GLOBAL_RNG, d, n)
 
 sampler(d::ExtremeBeta) = d
+
+# PDF -------------------------------------------------------------------------------------------
+
+# μ=0.5; ϕ=1; k0=0.01; k1=0.01
+# d = ExtremeBeta(μ, ϕ, k0, k1)
+
+# function logpdf(d::ExtremeBeta, x::Real)
+#     μ, ϕ, k0, k1 = params(d)
+
+#     if x == 0
+#         return log1p(-logistic(μ - thresh[1]))
+#     elseif x == 1
+#         return log(logistic(μ - thresh[2]))
+#     elseif 0 < x < 1
+#         log_p_middle = log1pexp(μ - thresh[1]) - log1pexp(μ - thresh[2])
+#         return log_p_middle + logpdf(d.beta_dist, x)
+#     else
+#         return -Inf
+#     end
+# end
+
+# pdf(d::OrderedBeta, x::Real) = exp(logpdf(d, x))
+# loglikelihood(d::OrderedBeta, x::Real) = logpdf(d, x)

@@ -31,3 +31,6 @@ Distributions.Beta{Float64}(α=1.0, β=1.0)
 function BetaPhi2(μ::Real, ϕ::Real)
     return Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ))
 end
+
+
+# TODO: should we write a new type for this?
