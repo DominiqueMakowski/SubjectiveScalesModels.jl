@@ -1,5 +1,6 @@
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 SubjectiveScalesModels = "da3460ee-0a2f-4d2a-8d76-316f36bde5da"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
