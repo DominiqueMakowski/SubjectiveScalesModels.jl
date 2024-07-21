@@ -20,11 +20,7 @@ ExtremeBeta
 ```
 
 
-## Choco()
 
-```@docs
-Choco
-```
 
 ## Other
 
