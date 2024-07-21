@@ -3,7 +3,7 @@
 ## BetaPhi2()
 
 ```@docs
-BetaPhi2(μ::Real, ϕ::Real)
+BetaPhi2
 ```
 
 ## OrderedBeta()
