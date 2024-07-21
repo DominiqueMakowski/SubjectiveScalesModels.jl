@@ -138,8 +138,8 @@ fig  # hide
     end
 end
 
-# fit = model_choco(y)
-# posteriors = sample(fit, NUTS(), 500);
+fit = model_choco(y)
+posteriors = sample(fit, NUTS(), 500);
 ```
 
 !!! tip
@@ -164,28 +164,4 @@ results = DataFrame(
 )
 
 results
-```
-
-## Real Data Example
-
-### Download Data 
-
-
-```@example choco2
-using DataFrames, CSV, Downloads
-using Random
-using Turing
-using CairoMakie
-using StatsFuns: logistic
-using SubjectiveScalesModels
-```
-
-```@example choco2
-Random.seed!(123)
-
-df = CSV.read(Downloads.download("https://raw.githubusercontent.com/RealityBending/FakeFace/main/data/data.csv"), DataFrame)
-df = df[:, [:Participant, :Stimulus, :Real, :Attractive]]
-
-
-hist(df.Real, bins=50, color=:darkred)
 ```
