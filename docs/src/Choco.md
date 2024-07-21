@@ -35,52 +35,79 @@ hist(y, bins=100, color=:darkred)
 
 #### Priors
 
+```@raw html
+<details><summary>See code</summary>
+```
+
 ```@example choco1
-fig =  Figure()
-ax1 = Axis(fig[1, 1])
+fig =  Figure(size = (1000, 700))
+ax1 = Axis(fig[1, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
 
 p0 =  Normal(0, 3)
-μ0 = Normal(0, 3)
-μ1 = Normal(0, 2)
+μ0 = Normal(0, 2)
+μ1 = Normal(0, 1.5)
+ϕ0 = Normal(0, 1.0)
+ϕ1 = Normal(0, 0.8)
 
-xaxis1 = range(-10, 10, 100)
+xaxis1 = range(-10, 10, 1000)
 
 lines!(ax1, xaxis1, pdf.(p0, xaxis1), color=:purple, linewidth=2, label="p0 ~ Normal(0, 3)")
 axislegend(ax1; position=:rt)
 
-ax2 = Axis(fig[1, 2])
+ax2 = Axis(fig[1, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
 lines!(ax2, logistic.(xaxis1), pdf.(p0, xaxis1), color=:purple, linewidth=2, label="p0")
 
-ax3 = Axis(fig[2, 1])
-lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
-lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1")
+ax3 = Axis(fig[2, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 2)")
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 1.5)")
 axislegend(ax3; position=:rt)
 
-ax4 = Axis(fig[2, 2])
+ax4 = Axis(fig[2, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
 lines!(ax4, logistic.(xaxis1), pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
 lines!(ax4, logistic.(xaxis1), pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1")
 
 ax5 = Axis(fig[3, 1], 
-    xlabel="Prior on the log-scale",
+    xlabel="Prior on the log scale",
     ylabel="Distribution",
     yticksvisible=false,
     xticksvisible=false,
     yticklabelsvisible=false)
-lines!(ax5, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
-lines!(ax5, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1")
+lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0 ~ Normal(0, 1)")
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 0.8)")
 axislegend(ax5; position=:rt)
 
 ax6 = Axis(fig[3, 2], 
     xlabel="Prior after exponential transformation",
-    ylabel="Distribution",
     yticksvisible=false,
     xticksvisible=false,
     yticklabelsvisible=false)
-lines!(ax6, logistic.(xaxis1), pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
-lines!(ax6, logistic.(xaxis1), pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1")
+vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0")
+lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1")
+xlims!(ax6, 0, 10)
 fig
 ```
-
+```@raw html
+</details>
+```
 
 ```@example choco1
 # @model function model_choco(y)
