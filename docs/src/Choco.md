@@ -18,17 +18,17 @@ Choco
 Let's generate some data from a `Choco()` distribution with known parameters that we are going to try to recover using Bayesian modelling.
 
 ```@example choco1
-using Random
 using DataFrames
-using SubjectiveScalesModels
+using Random
 using Turing
 using CairoMakie
 using StatsFuns: logistic
-
-Random.seed!(123)
+using SubjectiveScalesModels
 ```
 
 ```@example choco1
+Random.seed!(123)
+
 y = rand(Choco(p0=0.3, μ0=0.7, ϕ0=1, μ1=0.3, ϕ1=3.0), 1000)
 
 hist(y, bins=100, color=:darkred)
@@ -137,7 +137,7 @@ fig
 end
 
 fit = model_choco(y)
-chains = sample(fit, NUTS(), 500)
+posteriors = sample(fit, NUTS(), 500)
 ```
 
 !!! tip
@@ -147,7 +147,7 @@ chains = sample(fit, NUTS(), 500)
 
 
 ```@example choco1
-posterior_mean = DataFrame(mean(chains))
+posterior_mean = DataFrame(mean(posteriors))
 
 # Format
 results = DataFrame(
@@ -156,8 +156,8 @@ results = DataFrame(
     Estimate = round.([
         logistic(posterior_mean.mean[1]), 
         logistic(posterior_mean.mean[2]),
-        exp(posterior_mean.mean[3]),
-        logistic(posterior_mean.mean[4]),
+        logistic(posterior_mean.mean[3]),
+        exp(posterior_mean.mean[4]),
         exp(posterior_mean.mean[5])
         ]; digits=2),
     Truth = [0.3, 0.7, 1, 0.3, 3]
@@ -169,3 +169,138 @@ rand(Choco(0.5, 0.5, 1.0, 1, 1.0), 1000)
 ```
 
 ## Real Data Example
+
+### Download Data 
+
+
+```@example choco2
+using DataFrames, CSV, Downloads
+using Random
+using Turing
+using CairoMakie
+using StatsFuns: logistic
+using SubjectiveScalesModels
+```
+
+```@example choco2
+Random.seed!(123)
+
+df = CSV.read(Downloads.download("https://raw.githubusercontent.com/RealityBending/FakeFace/main/data/data.csv"), DataFrame)
+df = df[:, [:Participant, :Stimulus, :Real, :Attractive]]
+
+
+hist(df.Real, bins=50, color=:darkred)
+```
+
+Many zeros and ones, which will create problems with the simple Choco model.
+
+```@example choco2
+df = df[(df.Real .> 0.001) .& (df.Real .< 0.999) .& (df.Real .!= 0.5), :]
+```
+
+In order to decrease the duration of the sampling (for demonstration), we will also keep only the first 2000 rows.
+
+```@example choco2
+df = df[1:1000, :]
+
+hist(df.Real, bins=50, color=:darkblue)
+```
+
+### Basic Model 
+
+Fit model:
+
+```@example choco2
+@model function model_choco(Real)
+    p0 ~ Normal(0, 2)
+    μ0 ~ truncated(Normal(0, 1.0), -10, 10)
+    μ1 ~ truncated(Normal(0, 1.0), -10, 10)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 1.0)
+
+    for i in 1:length(Real)
+        Real[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
+
+fit = model_choco(df.Real)
+posteriors = sample(fit, NUTS(), 500)
+hpd(posteriors; alpha=0.95)
+```
+
+```@example choco2
+posterior_mean = DataFrame(mean(posteriors))
+results = DataFrame(
+    Parameter = posterior_mean.parameters,
+    Estimate = round.([
+        logistic(posterior_mean.mean[1]), 
+        logistic(posterior_mean.mean[2]),
+        logistic(posterior_mean.mean[3]),
+        exp(posterior_mean.mean[4]),
+        exp(posterior_mean.mean[5])
+        ]; digits=2)
+)
+```
+
+```@example choco2
+pred = predict(model_choco([(missing) for _ in 1:nrow(df)]), posteriors)
+pred = Array(pred)
+
+fig = hist(df.Real, normalization=:pdf, color=:darkblue, bins=50)
+for i in 1:length(posteriors)
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:orange, 0.1), strokewidth=3, boundary=(0, 1))
+end
+fig
+```
+
+
+### Effect of Attractiveness
+
+
+```@example choco2
+@model function model_choco2(Real, Attractive)
+    # Priors at intercept
+    p0_intercept ~ Normal(0, 2)
+    μ0_intercept ~ truncated(Normal(0, 1.0), -10, 10)
+    μ1_intercept ~ truncated(Normal(0, 1.0), -10, 10)
+    ϕ0_intercept ~ Normal(0, 1)
+    ϕ1_intercept ~ Normal(0, 1.0)
+
+    # Priors over attractiveness effect
+    p0_attractiveness ~ Normal(0, 0.5)
+    μ0_attractiveness ~ Normal(0, 0.5)
+    μ1_attractiveness ~ Normal(0, 0.5)
+    ϕ0_attractiveness ~ Normal(0, 0.1)
+    ϕ1_attractiveness ~ Normal(0, 0.1)
+
+    # Inference
+    for i in 1:length(Real)
+        p0 = logistic(p0_intercept + p0_attractiveness * Attractive[i])
+        μ0 = logistic(μ0_intercept + μ0_attractiveness * Attractive[i])
+        μ1 = logistic(μ1_intercept + μ1_attractiveness * Attractive[i])
+        ϕ0 = exp(ϕ0_intercept + ϕ0_attractiveness * Attractive[i])
+        ϕ1 = exp(ϕ1_intercept + ϕ1_attractiveness * Attractive[i])
+        
+        Real[i] ~ Choco(p0, μ0, ϕ0, μ1, ϕ1)
+    end
+end
+
+fit = model_choco2(df.Real, df.Attractive)
+posteriors = sample(fit, NUTS(), 500)
+hpd(posteriors; alpha=0.95)
+```
+
+```@example choco2
+pred = predict(model_choco2(
+    [(missing) for _ in 1:1000],
+    repeat([0, 1]; inner=500)
+), posteriors)
+pred = Array(pred)
+
+fig = hist(df.Real, normalization=:pdf, color=:grey, bins=50)
+for i in 1:length(posteriors)
+    density!(pred[i, 1:500], color=(:black, 0), strokecolor=(:brown, 0.1), strokewidth=3, boundary=(0, 1))
+    density!(pred[i, 501:1000], color=(:black, 0), strokecolor=(:blue, 0.1), strokewidth=3, boundary=(0, 1))
+end
+fig
+```
