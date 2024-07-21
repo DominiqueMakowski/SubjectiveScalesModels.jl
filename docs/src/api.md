@@ -20,8 +20,6 @@ ExtremeBeta
 ```
 
 
-
-
 ## Other
 
 ### data_rescale()

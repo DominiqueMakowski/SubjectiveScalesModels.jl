@@ -24,6 +24,8 @@ using SubjectiveScalesModels
 using Turing
 using CairoMakie
 using StatsFuns: logistic
+
+Random.seed!(123)
 ```
 
 ```@example choco1
@@ -57,8 +59,8 @@ ax1 = Axis(fig[1, 1],
     yticklabelsvisible=false)
 
 p0 =  Normal(0, 3)
-μ0 = Normal(0, 2)
-μ1 = Normal(0, 1.5)
+μ0 = Normal(0, 1.5)
+μ1 = Normal(0, 1.0)
 ϕ0 = Normal(0, 1.0)
 ϕ1 = Normal(0, 0.8)
 
@@ -80,8 +82,8 @@ ax3 = Axis(fig[2, 1],
     yticksvisible=false,
     xticksvisible=false,
     yticklabelsvisible=false)
-lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 2)")
-lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 1.5)")
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 1.5)")
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 1.0)")
 axislegend(ax3; position=:rt)
 
 ax4 = Axis(fig[2, 2], 
@@ -124,8 +126,8 @@ fig
 ```@example choco1
 @model function model_choco(y)
     p0 ~ Normal(0, 3)
-    μ0 ~ truncated(Normal(0, 2), -10, 10)
-    μ1 ~ truncated(Normal(0, 1.5), -10, 10)
+    μ0 ~ truncated(Normal(0, 1.5), -10, 10)
+    μ1 ~ truncated(Normal(0, 1.0), -10, 10)
     ϕ0 ~ Normal(0, 1)
     ϕ1 ~ Normal(0, 0.8)
 
@@ -137,6 +139,12 @@ end
 fit = model_choco(y)
 chains = sample(fit, NUTS(), 500)
 ```
+
+!!! tip
+    It can be useful to truncate the priors for $\mu$ to avoid the model to explore regions to close to the boundaries 0 and 1 (after transformation), as it might lead to convergence errors
+
+
+
 
 ```@example choco1
 posterior_mean = DataFrame(mean(chains))
@@ -159,3 +167,5 @@ results
 
 rand(Choco(0.5, 0.5, 1.0, 1, 1.0), 1000)
 ```
+
+## Real Data Example
