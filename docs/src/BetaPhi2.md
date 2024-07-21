@@ -87,7 +87,6 @@ xlims!(ax4, -0.5, 15);
 </details>
 ```
 
-
 ```@example betaphi1
 fig  # hide
 ```

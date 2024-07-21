@@ -145,3 +145,47 @@ end
 !!! tip
     It can be useful to truncate the priors for $\mu$ to avoid the model to explore regions to close to the boundaries 0 and 1 (after transformation), as it might lead to convergence errors
 
+
+```@example choco1
+posterior_mean = DataFrame(mean(posteriors))
+
+# Format
+results = DataFrame(
+    Parameter = posterior_mean.parameters,
+    Posterior_Mean = round.(posterior_mean.mean; digits=2),
+    Estimate = round.([
+        logistic(posterior_mean.mean[1]), 
+        logistic(posterior_mean.mean[2]),
+        logistic(posterior_mean.mean[3]),
+        exp(posterior_mean.mean[4]),
+        exp(posterior_mean.mean[5])
+        ]; digits=2),
+    Truth = [0.3, 0.7, 1, 0.3, 3]
+)
+
+results
+```
+
+## Real Data Example
+
+### Download Data 
+
+
+```@example choco2
+using DataFrames, CSV, Downloads
+using Random
+using Turing
+using CairoMakie
+using StatsFuns: logistic
+using SubjectiveScalesModels
+```
+
+```@example choco2
+Random.seed!(123)
+
+df = CSV.read(Downloads.download("https://raw.githubusercontent.com/RealityBending/FakeFace/main/data/data.csv"), DataFrame)
+df = df[:, [:Participant, :Stimulus, :Real, :Attractive]]
+
+
+hist(df.Real, bins=50, color=:darkred)
+```
