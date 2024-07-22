@@ -158,7 +158,7 @@ hpd(posteriors)
 
 Let us do a **Posterior Predictive Check** which involves the generation of predictions from the model to compare the predicted distribution against the actual observed data.
 
-```@example betaphi1
+```@example choco1
 # Make predictions
 pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
 pred = Array(pred)
@@ -171,3 +171,25 @@ xlims!(0, 1)
 fig
 ```
 
+### Recover Parameters
+
+
+```@example choco1
+posterior_mean = DataFrame(mean(posteriors))
+
+# Format
+results = DataFrame(
+    Parameter = posterior_mean.parameters,
+    Posterior_Mean = round.(posterior_mean.mean; digits=2),
+    Estimate = round.([
+        logistic(posterior_mean.mean[1]), 
+        logistic(posterior_mean.mean[2]),
+        logistic(posterior_mean.mean[3]),
+        exp(posterior_mean.mean[4]),
+        exp(posterior_mean.mean[5])
+        ]; digits=2),
+    Truth = [0.3, 0.7, 1, 0.3, 3]
+)
+
+results
+```
