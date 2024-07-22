@@ -230,3 +230,27 @@ df = df[1:1000, :]
 
 hist(df.Real, bins=30,  normalization=:pdf, color=:crimson)
 ```
+
+### Basic Model 
+
+Fit model:
+
+```@example choco2
+@model function model_choco(y)
+    p1 ~ Normal(0, 2)
+    μ0 ~ Normal(0, 1)
+    μ1 ~ Normal(0, 1)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 1)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
+
+fit = model_choco(y)
+posteriors = sample(fit, NUTS(), 500)
+
+# 95% CI
+hpd(posteriors)
+```
