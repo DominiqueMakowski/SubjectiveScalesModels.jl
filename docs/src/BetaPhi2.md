@@ -1,6 +1,4 @@
-# BetaPhi2
-
-
+# BetaPhi2() for Beta Regressions
 
 Regression models with a **Beta** distribution can be useful to predict scores from bounded variables (that has an upper and lower limit), such as that of scales.
 

@@ -14,5 +14,7 @@ This package's functions are demonstrated in the [**Cognitive Models**](https://
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
+## Table of Content
+
 ```@index
 ```

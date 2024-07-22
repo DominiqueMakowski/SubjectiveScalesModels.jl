@@ -14,7 +14,8 @@ It is defined as `Beta(μ * 2ϕ, (1 - μ) * 2ϕ)`.
 - `ϕ`: Precision parameter (must be \$> 0\$).
 
 # Details
-*Beta Phi2* is a variant of the traditional *Mu-Phi* parametrization defined as \$Beta(μ * ϕ, (1 - μ) * ϕ)\$ in which, when μ is at its center (i.e., 0.5), a ϕ equal to 1 results in a flat prior (i.e., \$Beta(1, 1)\$).
+*Beta Phi2* is a variant of the traditional *Mu-Phi* location-precision parametrization. 
+The modification - scaling ϕ by a factor of 1/2 - creates in a Beta distribution in which, when μ is at its center (i.e., 0.5), a parameter ϕ equal to 1 results in a flat prior (i.e., \$Beta(1, 1)\$).
 It is useful to set priors for ϕ on the log scale in regression models, so that a prior of \$Normal(0, 1)\$ assigns the most probability on a flat distribution (ϕ=1).
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)

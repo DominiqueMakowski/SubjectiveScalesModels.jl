@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Please cite this package as below."
+authors:
+    - family-names: "Makowski"
+      given-names: "Dominique"
+      orcid: "https://orcid.org/0000-0001-5375-9967"
+title: "SubjectiveScalesModels.jl: A Julia package for Beta-like regression models useful for subjective scales data"
+version: 0.0.1
+# doi: 10.5281/zenodo.12685343
+date-released: 2024-07-22
+url: "https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl"

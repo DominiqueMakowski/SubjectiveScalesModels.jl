@@ -9,7 +9,6 @@ Toolbox for modelling scores from subjective scales (for example Likert or analo
 
 ## Roadmap
 
-- [x] Make a Julia package
 - [x] BetaPhi2
 - [x] Choice-Confidence (Choco)
 - [ ] OrderedBeta
@@ -20,12 +19,11 @@ Toolbox for modelling scores from subjective scales (for example Likert or analo
 
 ### BetaPhi2
 
+- [x] [**Documentation**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/)
 
 ```julia
 BetaPhi2(0.5, 1)
 ```
-
-- See [documentation](LINK)
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
