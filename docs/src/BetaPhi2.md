@@ -34,7 +34,7 @@ Random.seed!(123)
 
 y = rand(BetaPhi2(μ=0.7, ϕ=3.0), 1000)
 
-hist(y, bins=100, color=:darkred)
+hist(y, bins=100, color=:dodgerblue, normalization=:pdf)
 ```
 
 
@@ -126,6 +126,23 @@ posteriors = sample(fit, NUTS(), 500)
 # 95% CI
 hpd(posteriors)
 ```
+
+
+Let us do a **Posterior Predictive Check** which involves the generation of predictions from the model to compare the predicted distribution against the actual observed data.
+
+```@example betaphi1
+# Make predictions
+pred = predict(model_beta([missing for _ in 1:length(y)]), posteriors)
+pred = Array(pred)
+
+fig = hist(y, bins=100, color=:dodgerblue, normalization=:pdf)
+for i in 1:size(pred, 1) # Iterate over each draw
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:crimson, 0.05), strokewidth=3)
+end
+xlims!(0, 1)
+fig
+```
+
 
 ### Recover Parameters
 
