@@ -1,5 +1,6 @@
-import Distributions: Beta
-
+import Distributions
+import StatsBase
+import Random
 
 """
     BetaPhi2(μ, ϕ)
@@ -31,13 +32,57 @@ julia> BetaPhi2(μ=0.7, ϕ=3.0)
 Distributions.Beta{Float64}(α=4.199999999999999, β=1.8000000000000003)
 ```
 """
-function BetaPhi2(; μ::Real=0.5, ϕ::Real=1.0)
-    return Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ))
+struct BetaPhi2{T<:Real} <: Distributions.ContinuousUnivariateDistribution
+    μ::T
+    ϕ::T
+    # beta_dist::Distributions.Beta{T}
+
+    function BetaPhi2{T}(μ::T, ϕ::T) where {T<:Real}
+        @assert ϕ > 0 "ϕ must be > 0"
+        # new{T}(μ, ϕ, Distributions.Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ)))
+        new{T}(μ, ϕ)
+    end
 end
+
+BetaPhi2(μ::T, ϕ::T) where {T<:Real} = BetaPhi2{T}(μ, ϕ)
 
 function BetaPhi2(μ::Real, ϕ::Real)
-    return BetaPhi2(μ=μ, ϕ=ϕ)
+    T = promote_type(typeof(μ), typeof(ϕ))
+    return BetaPhi2(T(μ), T(ϕ))
 end
 
-# TODO: should we write a new type for this?
-# TODO: would it help to implement a bespoke logpdf method?
+BetaPhi2(; μ::Real=0.5, ϕ::Real=1) = BetaPhi2(μ, ϕ)
+
+# Definition ----------------------------------------------------------------------------------------
+function _BetaPhi2(μ::Real, ϕ::Real)
+    return Distributions.Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ))
+end
+
+# Basic ------------------------------------------------------------------------------------------
+Distributions.params(d::BetaPhi2) = (d.μ, d.ϕ)
+Distributions.minimum(::BetaPhi2) = 0
+Distributions.maximum(::BetaPhi2) = 1
+Distributions.insupport(::BetaPhi2, x::Real) = 0 ≤ x ≤ 1
+Distributions.mean(d::BetaPhi2) = Distributions.mean(_BetaPhi2(d.μ, d.ϕ))
+Distributions.var(d::BetaPhi2) = Distributions.var(_BetaPhi2(d.μ, d.ϕ))
+
+# Random -------------------------------------------------------------------------------------------
+Distributions.sampler(d::BetaPhi2) = Distributions.sampler(_BetaPhi2(d.μ, d.ϕ))
+Random.rand(rng::Random.AbstractRNG, d::BetaPhi2) = Distributions.rand(rng, _BetaPhi2(d.μ, d.ϕ))
+Random.rand(d::BetaPhi2) = rand(Random.GLOBAL_RNG, d)
+Random.rand(rng::Random.AbstractRNG, d::BetaPhi2, n::Int) = [rand(rng, d) for _ in 1:n]
+Random.rand(d::BetaPhi2, n::Int) = rand(Random.GLOBAL_RNG, d, n)
+
+# PDF -------------------------------------------------------------------------------------------
+Distributions.pdf(d::BetaPhi2, x::Real) = Distributions.pdf(_BetaPhi2(d.μ, d.ϕ), x)
+function Distributions.logpdf(d::BetaPhi2, x::Real)
+    if (d.μ <= eps()) | (d.μ >= 1 - eps())
+        return -Inf
+    end
+    return Distributions.logpdf(_BetaPhi2(d.μ, d.ϕ), x)
+end
+
+Distributions.cdf(d::BetaPhi2, x::Real) = Distributions.cdf(_BetaPhi2(d.μ, d.ϕ), x)
+
+
+

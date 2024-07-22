@@ -105,22 +105,30 @@ fig  # hide
 
 ### Bayesian Model with Turing
 
-```@repl betaphi1
+```@example betaphi1
 @model function model_beta(y)
     μ ~ Normal(0, 1)
     ϕ ~ Normal(0, 1)
 
     for i in 1:length(y)
-        μ_raw = logistic(μ)
-        # if (μ_raw <= eps()) | (μ_raw >= 1 - eps())
-        #     Turing.@addlogprob! -Inf
-        #     return nothing
-        # end
-        y[i] ~ BetaPhi2(μ_raw, exp(ϕ))
+        y[i] ~ BetaPhi2(logistic(μ), exp(ϕ))
     end
 end
 
 fit = model_beta(y)
 posteriors = sample(fit, NUTS(), 500)
+hpd(posteriors)
 ```
 
+### Recover Parameters
+
+```@example betaphi1
+means = DataFrame(mean(posteriors))
+
+table = DataFrame(
+    Parameter = means.parameters,
+    PosteriorMean = means.mean,
+    Estimate = [logistic(means.mean[1]), exp(means.mean[2])],
+    TrueValue = [0.7, 3.0]
+)
+```
