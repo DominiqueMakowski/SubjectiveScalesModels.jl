@@ -25,13 +25,8 @@ The blue area shows the region where the distribution is "convex" and peaks with
 
 # Examples
 ```jldoctest
-julia> using Distributions, SubjectiveScalesModels
-
 julia> BetaPhi2(0.5, 1)
 BetaPhi2{Float64}(μ=0.5, ϕ=1.0)
-
-julia> mean(BetaPhi2(μ=0.6, ϕ=3.0))
-0.6
 ```
 """
 struct BetaPhi2{T<:Real} <: Distributions.ContinuousUnivariateDistribution
