@@ -40,3 +40,134 @@ y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2), 10000)
 
 hist(y, bins=100,  normalization=:pdf, color=:darkorange)
 ```
+
+### Prior Specification
+
+Deciding on priors requires a good understanding of the meaning of the parameters of the [`BetaPhi2`](@ref) distribution on which the **Choco** model is based. Make sure you first read the [documentation page](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/#Prior-Specification) about priors of the `BetaPhi2()` distribution.
+
+The parameters of the `Choco()` distribution have the following requirements:
+
+- `p0`, `μ0` and `μ1`: Must be in the interval 0-1.
+- `ϕ0` and `ϕ1`: Must be positive (with a special value at 1 where the distribution is flat when μ is at 0.5).
+
+Because of these specificities, it this convenient to express priors on a different scale (the logit scale for `p0`, `μ0` and `μ1`, and the log scale for `ϕ0` and `ϕ1`) and then transform them using a logistic or exponential link functions.
+
+```@raw html
+<details><summary>See code</summary>
+```
+
+```@example choco1
+p1 =  Normal(0, 2.0)
+μ0 = Normal(0, 1.0)
+μ1 = Normal(0, 0.8)
+ϕ0 = Normal(0, 1.0)
+ϕ1 = Normal(0, 0.5)
+
+fig =  Figure(size = (850, 600))
+
+ax1 = Axis(fig[1, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+
+xaxis1 = range(-10, 10, 1000)
+
+lines!(ax1, xaxis1, pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1 ~ Normal(0, 2)")
+axislegend(ax1; position=:rt)
+
+ax2 = Axis(fig[1, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax2, logistic.(xaxis1), pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1")
+
+ax3 = Axis(fig[2, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 1)")
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 0.8)")
+axislegend(ax3; position=:rt)
+
+ax4 = Axis(fig[2, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax4, logistic.(xaxis1), pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
+lines!(ax4, logistic.(xaxis1), pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1")
+
+ax5 = Axis(fig[3, 1], 
+    xlabel="Prior on the log scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0 ~ Normal(0, 1)")
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 0.5)")
+axislegend(ax5; position=:rt)
+
+ax6 = Axis(fig[3, 2], 
+    xlabel="Prior after exponential transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0")
+lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1")
+xlims!(ax6, 0, 10)
+
+fig[0, :] = Label(fig, "Priors for Choco Models", fontsize=20, color=:black, font=:bold)
+fig;
+```
+```@raw html
+</details>
+```
+
+```@example choco1
+fig  # hide
+```
+
+
+### Bayesian Model with Turing
+
+```@example choco1
+@model function model_choco(y)
+    p1 ~ Normal(0, 2)
+    μ0 ~ Normal(0, 1)
+    μ1 ~ Normal(0, 0.8)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 0.5)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+    end
+end
+
+fit = model_choco(y)
+posteriors = sample(fit, NUTS(), 500)
+
+# 95% CI
+hpd(posteriors)
+```
+
+Let us do a **Posterior Predictive Check** which involves the generation of predictions from the model to compare the predicted distribution against the actual observed data.
+
+```@example betaphi1
+# Make predictions
+pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
+pred = Array(pred)
+
+fig = hist(y, bins=100, color=:darkorange, normalization=:pdf)
+for i in 1:size(pred, 1) # Iterate over each draw
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=3)
+end
+xlims!(0, 1)
+fig
+```
+
