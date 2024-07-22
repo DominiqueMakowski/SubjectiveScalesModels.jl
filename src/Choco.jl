@@ -13,8 +13,11 @@ The Beta distributions are defined using the [`BetaPhi2`](@ref) parametrization.
 - `p1`: Overall probability of the answers being on the right half (i.e., answers between 0.5 and 1).
 - `μ0`, `μ1`: Mean of the Beta distributions for the left and right halves, respectively.
 - `ϕ0`, `ϕ1`: Precision of the Beta distributions for the left and right halves, respectively.
-- `p_mid`: Probability of the answers being in the middle of the scale (i.e., answers around 0.5). Default is 0, which means that the model is a simple mixture of the two other Beta distributions.
-- `ϕ_mid`: Precision of the Beta distribution for the middle of the scale (relevant if `p_mid` > 0).
+- `p_mid`: Probability of the answers being in the middle of the scale (i.e., answers around 0.5). 
+  Default is 0, which means that the model is a simple mixture of the two other Beta distributions.
+- `ϕ_mid`: Precision of the Beta distribution for the middle of the scale (relevant if `p_mid` > 0). 
+  Default to 100. This parameter should probably never be as low as 1, as it would be a flat distribution, 
+  rendering the distribution unidentifiable (since the same pattern could be observed with another combination of parameters).
 
 See [`BetaPhi2`](@ref) for more details about the parameters.
 
@@ -33,7 +36,7 @@ In the case of responses clustered in the middle of the scale (at 0.5), in this 
 # Examples
 ```jldoctest
 julia> Choco(p1=0.5, μ0=0.7, ϕ0=2, μ1=0.7, ϕ1=2)
-Choco{Float64}(p1=0.5, μ0=0.7, ϕ0=2.0, μ1=0.7, ϕ1=2.0)
+Choco{Float64}(p1=0.5, μ0=0.7, ϕ0=2.0, μ1=0.7, ϕ1=2.0, p_mid=0.0, ϕ_mid=100.0)
 ```
 """
 struct Choco{T<:Real} <: Distributions.ContinuousUnivariateDistribution
