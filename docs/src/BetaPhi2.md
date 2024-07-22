@@ -12,7 +12,7 @@ BetaPhi2
 
 ### Simulate Data
 
-!!! tip "TLDR"
+!!! tip "Summary"
     You can use `rand(dist, n)` to generate *n* observations from a `BetaPhi2()` distribution.
 
 Let's generate some data from a `BetaPhi2()` distribution with known parameters that we are going to try to recover using Bayesian modelling.
@@ -37,6 +37,10 @@ hist(y, bins=100, color=:darkred)
 
 
 ### Prior Specification
+
+!!! tip "Summary"
+    Expressing *μ* on the logit scale and *ϕ* on the log scale is recommended, with default priors as $Normal(0, 1)$.
+
 
 Expressing parameters on the logit scale for `μ` and the log scale for `ϕ` can be useful to define priors that are more interpretable and easier to specify (and to avoid computational issues caused by the bounded nature of the parameters).
 
