@@ -7,26 +7,28 @@
 
 Toolbox for modelling scores from subjective scales (for example Likert or analog scales), common in psychology and cognitive neuroscience.
 
-## Roadmap
-
-- [x] BetaPhi2
-- [x] Choice-Confidence (Choco)
-- [ ] OrderedBeta
-- [ ] ZOIB
-
-
 ## Features
 
-### BetaPhi2
-
-- [x] [**Documentation**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/)
+### BetaPhi2() Distribution for Beta Regressions
 
 ```julia
 BetaPhi2(0.5, 1)
 ```
 
+- [x] [**Documentation**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/)
+
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
 
+### Choice-Confidence (Choco) Model
 
+- [ ] To do.
+
+### Ordered Beta Model
+
+- [ ] To do.
+
+### Zero-One-Inflated Beta Model (ZOIB)
+
+- [ ] To do.
 
