@@ -14,8 +14,8 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "BetaPhi2" => "BetaPhi2.md",
-        "Choco" => "Choco.md",
+        "BetaPhi2() for Beta Regressions" => "BetaPhi2.md",
+        "Choice-Confidence (Choco) Model" => "Choco.md",
         "Other Functions" => "api.md",
     ],
 )
