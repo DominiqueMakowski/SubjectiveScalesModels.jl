@@ -193,3 +193,40 @@ results = DataFrame(
 
 results
 ```
+
+## Real Data Example
+
+### Data Preprocessing 
+
+
+```@example choco2
+using DataFrames, CSV, Downloads
+using Random
+using Turing
+using CairoMakie
+using StatsFuns: logistic
+using SubjectiveScalesModels
+```
+
+```@example choco2
+Random.seed!(123)
+
+df = CSV.read(Downloads.download("https://raw.githubusercontent.com/RealityBending/FakeFace/main/data/data.csv"), DataFrame)
+df = df[:, [:Participant, :Stimulus, :Real, :Attractive]]
+
+hist(df.Real, bins=30,  normalization=:pdf, color=:darkred)
+```
+
+Many zeros and ones, which will create problems with the simple Choco model.
+
+```@example choco2
+df = df[(df.Real .> 0.001) .& (df.Real .< 0.999), :];
+```
+
+In order to decrease the duration of the sampling (for demonstration), we will also keep only the first 1000 rows.
+
+```@example choco2
+df = df[1:1000, :]
+
+hist(df.Real, bins=30,  normalization=:pdf, color=:crimson)
+```
