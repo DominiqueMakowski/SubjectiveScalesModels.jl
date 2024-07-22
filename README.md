@@ -22,7 +22,13 @@ BetaPhi2(0.5, 1)
 
 ### Choice-Confidence (Choco) Model
 
-- [ ] To do.
+```julia
+Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2)
+```
+
+- [x] [**Documentation**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/Choco/)
+
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_Choco1.gif?raw=true)
 
 
 ### Ordered Beta Model
