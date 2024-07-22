@@ -1,8 +1,12 @@
 # BetaPhi2
 
+
+
 Regression models with a **Beta** distribution can be useful to predict scores from bounded variables (that has an upper and lower limit), such as that of scales.
 
 The `SubjectiveScalesModels.jl` package defines the the `BetaPhi2()` function that can be used to generate or model this type of data.
+
+## Function
 
 ```@docs
 BetaPhi2
