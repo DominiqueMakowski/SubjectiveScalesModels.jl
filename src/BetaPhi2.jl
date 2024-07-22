@@ -40,3 +40,4 @@ function BetaPhi2(μ::Real, ϕ::Real)
 end
 
 # TODO: should we write a new type for this?
+# TODO: would it help to implement a bespoke logpdf method?

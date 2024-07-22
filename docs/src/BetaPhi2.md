@@ -81,7 +81,8 @@ ax4 = Axis(fig[2, 2],
     yticklabelsvisible=false)
 vlines!(ax4, [1], color=:black, linestyle=:dash, linewidth=1)
 lines!(ax4, exp.(xaxis1), pdf.(ϕ, xaxis1), color=:green, linewidth=2, label="ϕ")
-xlims!(ax4, -0.5, 15);
+xlims!(ax4, -0.5, 15)
+fig;
 ```
 ```@raw html
 </details>
@@ -90,3 +91,25 @@ xlims!(ax4, -0.5, 15);
 ```@example betaphi1
 fig  # hide
 ```
+
+### Bayesian Model with Turing
+
+```@repl betaphi1
+@model function model_beta(y)
+    μ ~ Normal(0, 1)
+    ϕ ~ Normal(0, 1)
+
+    for i in 1:length(y)
+        μ_raw = logistic(μ)
+        # if (μ_raw <= eps()) | (μ_raw >= 1 - eps())
+        #     Turing.@addlogprob! -Inf
+        #     return nothing
+        # end
+        y[i] ~ BetaPhi2(μ_raw, exp(ϕ))
+    end
+end
+
+fit = model_beta(y)
+posteriors = sample(fit, NUTS(), 500)
+```
+
