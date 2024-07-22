@@ -24,9 +24,11 @@ BetaPhi2(0.5, 1)
 
 - [ ] To do.
 
+
 ### Ordered Beta Model
 
 - [ ] To do.
+
 
 ### Zero-One-Inflated Beta Model (ZOIB)
 
