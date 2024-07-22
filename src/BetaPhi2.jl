@@ -41,7 +41,9 @@ struct BetaPhi2{T<:Real} <: Distributions.ContinuousUnivariateDistribution
         if (ϕ <= 0)
             throw(DomainError(ϕ, "ϕ must be > 0"))
         end
-        if (μ <= 0) || (μ >= 1)
+
+        # The test below allows for μ to be == 0 or 1 to prevent logpdf from throwing an error
+        if (μ < 0) || (μ > 1)
             throw(DomainError(μ, "μ must be > 0 and < 1"))
         end
         new{T}(μ, ϕ)
