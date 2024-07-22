@@ -105,11 +105,15 @@ fig  # hide
 
 ### Bayesian Model with Turing
 
+We can easily use this distribution to fit a **Beta regression** model using the `Turing` package.
+
 ```@example betaphi1
 @model function model_beta(y)
+    # Priors
     μ ~ Normal(0, 1)
     ϕ ~ Normal(0, 1)
 
+    # Inference
     for i in 1:length(y)
         y[i] ~ BetaPhi2(logistic(μ), exp(ϕ))
     end
@@ -117,10 +121,17 @@ end
 
 fit = model_beta(y)
 posteriors = sample(fit, NUTS(), 500)
+
+# 95% CI
 hpd(posteriors)
 ```
 
 ### Recover Parameters
+
+!!! tip "Summary"
+    Use the `logistic()` (in the `StatsFuns` package) and `exp()` functions to transform the model parameters back to the original scale.
+
+Let us compare the parameters estimated by the model (the mean of the posteriors) with the true values used to generate the data (μ=0.7, ϕ=3.0).
 
 ```@example betaphi1
 means = DataFrame(mean(posteriors))
@@ -132,3 +143,5 @@ table = DataFrame(
     TrueValue = [0.7, 3.0]
 )
 ```
+
+Mission accomplished! 

@@ -38,8 +38,12 @@ struct BetaPhi2{T<:Real} <: Distributions.ContinuousUnivariateDistribution
     # beta_dist::Distributions.Beta{T}
 
     function BetaPhi2{T}(μ::T, ϕ::T) where {T<:Real}
-        @assert ϕ > 0 "ϕ must be > 0"
-        # new{T}(μ, ϕ, Distributions.Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ)))
+        if (ϕ <= 0)
+            throw(DomainError(ϕ, "ϕ must be > 0"))
+        end
+        if (μ <= 0) || (μ >= 1)
+            throw(DomainError(μ, "μ must be > 0 and < 1"))
+        end
         new{T}(μ, ϕ)
     end
 end
