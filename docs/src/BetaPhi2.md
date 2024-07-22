@@ -56,7 +56,8 @@ Expressing parameters on the logit scale for `μ` and the log scale for `ϕ` can
 μ = Normal(0, 1.0)
 ϕ = Normal(0, 1.0)
 
-fig =  Figure(size = (1000, 700))
+fig =  Figure(size = (850, 600))
+
 ax1 = Axis(fig[1, 1], 
     xlabel="Prior on the logit scale",
     ylabel="Prior on μ",
@@ -93,6 +94,8 @@ ax4 = Axis(fig[2, 2],
 vlines!(ax4, [1], color=:black, linestyle=:dash, linewidth=1)
 lines!(ax4, exp.(xaxis1), pdf.(ϕ, xaxis1), color=:green, linewidth=2, label="ϕ")
 xlims!(ax4, -0.5, 15)
+
+fig[0, :] = Label(fig, "Priors for Beta Regressions", fontsize=20, color=:black, font=:bold)
 fig;
 ```
 ```@raw html
