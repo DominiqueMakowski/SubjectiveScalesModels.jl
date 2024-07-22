@@ -1,19 +1,26 @@
-# Choco Model
+# Choice-Confidence (Choco) Model
 
-A **Choice-Confidence** scale is a subjective scale in which the left and right halves can be conceptualized as **two different choices** (e.g., True/False, Agree/Disagree, etc.), and the **magnitude** of the response (how much the cursor is placed towards he extremes) as the **confidence** in the corresponding choice.
+A **Choice-Confidence** scale is a subjective scale in which the left and right halves can be conceptualized as **two different choices** (e.g., True/False, Agree/Disagree, etc.), and the **magnitude** of the response (how much the cursor is set towards he extremes) as the **confidence** in the corresponding choice.
 
-This type of data can be modeled using a mixture of two scaled $Beta$ distributions expressing the confidence for each choice, each choice occurring with a certain probability.
+This type of data can be modeled using a "Choice-Confidence" model consisting of a mixture of two scaled $Beta$ distributions expressing the confidence for each choice, each choice occurring with a certain probability. This model assumes that participant's behaviour when faced with a scale with a psychology distinct left and right halves can be conceptualized as a decision between two discrete choices associated to a degree confidence in said-choice (rather than a continuous degree of one category as assumed with regular *Beta* models).
+
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/choco_illustration.png?raw=true)
 
 The `SubjectiveScalesModels.jl` package defines the the `Choco()` function that can be used to generate or model data from choice-confidence scales.
+
+## Function
 
 ```@docs
 Choco
 ```
 
 
-## Demonstration
+## Usage
 
-### Generate Data
+### Simulate Data
+
+!!! tip "Summary"
+    You can use `rand(dist, n)` to generate *n* observations from a `Choco()` distribution with pre-specified parameters.
 
 Let's generate some data from a `Choco()` distribution with known parameters that we are going to try to recover using Bayesian modelling.
 
@@ -29,14 +36,14 @@ using SubjectiveScalesModels
 ```@example choco1
 Random.seed!(123)
 
-y = rand(Choco(p0=0.3, μ0=0.7, ϕ0=1, μ1=0.3, ϕ1=3.0), 1000)
+y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2), 10000)
 
-hist(y, bins=100, color=:darkred)
+hist(y, bins=100,  normalization=:pdf, color=:darkorange)
 ```
 
-### Decide on Priors
+### Prior Specification
 
-Deciding on priors requires a good understanding of the meaning of the parameters of the [`BetaPhi2`](@ref) distribution on which the Choco model is based.
+Deciding on priors requires a good understanding of the meaning of the parameters of the [`BetaPhi2`](@ref) distribution on which the **Choco** model is based. Make sure you first read the [documentation page](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/#Prior-Specification) about priors of the `BetaPhi2()` distribution.
 
 The parameters of the `Choco()` distribution have the following requirements:
 
@@ -50,7 +57,14 @@ Because of these specificities, it this convenient to express priors on a differ
 ```
 
 ```@example choco1
-fig =  Figure(size = (1000, 700))
+p1 =  Normal(0, 2.0)
+μ0 = Normal(0, 1.0)
+μ1 = Normal(0, 0.8)
+ϕ0 = Normal(0, 1.0)
+ϕ1 = Normal(0, 0.5)
+
+fig =  Figure(size = (850, 600))
+
 ax1 = Axis(fig[1, 1], 
     xlabel="Prior on the logit scale",
     ylabel="Distribution",
@@ -58,15 +72,9 @@ ax1 = Axis(fig[1, 1],
     xticksvisible=false,
     yticklabelsvisible=false)
 
-p0 =  Normal(0, 3)
-μ0 = Normal(0, 1.5)
-μ1 = Normal(0, 1.0)
-ϕ0 = Normal(0, 1.0)
-ϕ1 = Normal(0, 0.8)
-
 xaxis1 = range(-10, 10, 1000)
 
-lines!(ax1, xaxis1, pdf.(p0, xaxis1), color=:purple, linewidth=2, label="p0 ~ Normal(0, 3)")
+lines!(ax1, xaxis1, pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1 ~ Normal(0, 2)")
 axislegend(ax1; position=:rt)
 
 ax2 = Axis(fig[1, 2], 
@@ -74,7 +82,7 @@ ax2 = Axis(fig[1, 2],
     yticksvisible=false,
     xticksvisible=false,
     yticklabelsvisible=false)
-lines!(ax2, logistic.(xaxis1), pdf.(p0, xaxis1), color=:purple, linewidth=2, label="p0")
+lines!(ax2, logistic.(xaxis1), pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1")
 
 ax3 = Axis(fig[2, 1], 
     xlabel="Prior on the logit scale",
@@ -82,8 +90,8 @@ ax3 = Axis(fig[2, 1],
     yticksvisible=false,
     xticksvisible=false,
     yticklabelsvisible=false)
-lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 1.5)")
-lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 1.0)")
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 1)")
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, label="μ1 ~ Normal(0, 0.8)")
 axislegend(ax3; position=:rt)
 
 ax4 = Axis(fig[2, 2], 
@@ -101,7 +109,7 @@ ax5 = Axis(fig[3, 1],
     xticksvisible=false,
     yticklabelsvisible=false)
 lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0 ~ Normal(0, 1)")
-lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 0.8)")
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 0.5)")
 axislegend(ax5; position=:rt)
 
 ax6 = Axis(fig[3, 2], 
@@ -112,7 +120,10 @@ ax6 = Axis(fig[3, 2],
 vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
 lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0")
 lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1")
-xlims!(ax6, 0, 10);
+xlims!(ax6, 0, 10)
+
+fig[0, :] = Label(fig, "Priors for Choco Models", fontsize=20, color=:black, font=:bold)
+fig;
 ```
 ```@raw html
 </details>
@@ -122,28 +133,45 @@ xlims!(ax6, 0, 10);
 fig  # hide
 ```
 
-### Specify Turing Model
 
+### Bayesian Model with Turing
 
 ```@example choco1
 @model function model_choco(y)
-    p0 ~ Normal(0, 3)
-    μ0 ~ truncated(Normal(0, 1.5), -10, 10)
-    μ1 ~ truncated(Normal(0, 1.0), -10, 10)
+    p1 ~ Normal(0, 2)
+    μ0 ~ Normal(0, 1)
+    μ1 ~ Normal(0, 0.8)
     ϕ0 ~ Normal(0, 1)
-    ϕ1 ~ Normal(0, 0.8)
+    ϕ1 ~ Normal(0, 0.5)
 
     for i in 1:length(y)
-        y[i] ~ Choco(logistic(p0), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
+        y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
     end
 end
 
 fit = model_choco(y)
-posteriors = sample(fit, NUTS(), 500);
+posteriors = sample(fit, NUTS(), 500)
+
+# 95% CI
+hpd(posteriors)
 ```
 
-!!! tip
-    It can be useful to truncate the priors for $\mu$ to avoid the model to explore regions to close to the boundaries 0 and 1 (after transformation), as it might lead to convergence errors
+Let us do a **Posterior Predictive Check** which involves the generation of predictions from the model to compare the predicted distribution against the actual observed data.
+
+```@example choco1
+# Make predictions
+pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
+pred = Array(pred)
+
+fig = hist(y, bins=100, color=:darkorange, normalization=:pdf)
+for i in 1:size(pred, 1) # Iterate over each draw
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=3)
+end
+xlims!(0, 1)
+fig
+```
+
+### Recover Parameters
 
 
 ```@example choco1
