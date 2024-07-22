@@ -12,6 +12,9 @@ BetaPhi2
 
 ### Simulate Data
 
+!!! tip "TLDR"
+    You can use `rand(dist, n)` to generate *n* observations from a `BetaPhi2()` distribution.
+
 Let's generate some data from a `BetaPhi2()` distribution with known parameters that we are going to try to recover using Bayesian modelling.
 
 
