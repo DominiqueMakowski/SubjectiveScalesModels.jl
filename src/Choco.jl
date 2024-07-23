@@ -10,7 +10,8 @@ It is defined as a mixture of two Beta distributions, one for each side of the s
 The Beta distributions are defined using the [`BetaPhi2`](@ref) parametrization.
 
 # Arguments
-- `p1`: Overall probability of the answers being on the right half (i.e., answers between 0.5 and 1).
+- `p1`: Overall probability of the answers being on the right half (i.e., answers between 0.5 and 1) relative to the left half (i.e., answers between 0 and 0.5).
+  Default is 0.5, which means that both sides (i.e., "choices") are equally probable.
 - `μ0`, `μ1`: Mean of the Beta distributions for the left and right halves, respectively.
 - `ϕ0`, `ϕ1`: Precision of the Beta distributions for the left and right halves, respectively.
 - `p_mid`: Probability of the answers being in the middle of the scale (i.e., answers around 0.5). 

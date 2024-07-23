@@ -2,7 +2,8 @@
 
 A **Choice-Confidence** scale is a subjective scale in which the left and right halves can be conceptualized as **two different choices** (e.g., True/False, Agree/Disagree, etc.), and the **magnitude** of the response (how much the cursor is set towards he extremes) as the **confidence** in the corresponding choice.
 
-This type of data can be modeled using a "Choice-Confidence" model consisting of a mixture of two scaled $Beta$ distributions expressing the confidence for each choice, each choice occurring with a certain probability. This model assumes that participant's behaviour when faced with a scale with a psychology distinct left and right halves can be conceptualized as a decision between two discrete choices associated to a degree confidence in said-choice (rather than a continuous degree of one category as assumed with regular *Beta* models).
+This type of data can be modeled using a "Choice-Confidence" model consisting of a mixture of two scaled $Beta$ distributions expressing the confidence for each choice, each choice occurring with a certain probability (*p0* and *p1*). 
+This model assumes that participant's behaviour when faced with a scale with a psychologically distinct left and right halves can be conceptualized as a decision between two discrete categories associated to a degree confidence in that choice (rather than a continuous degree of one category - e.g., "Agreement" - as assumed with regular *Beta* models).
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/choco_illustration.png?raw=true)
 
@@ -165,7 +166,7 @@ pred = Array(pred)
 
 fig = hist(y, bins=100, color=:darkorange, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
-    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=3)
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05))
 end
 xlims!(0, 1)
 fig
