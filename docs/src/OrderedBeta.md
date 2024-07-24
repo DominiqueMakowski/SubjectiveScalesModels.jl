@@ -78,7 +78,9 @@ data.x = data.PetalLength ./ maximum(data.PetalLength)
 
 # Inflate zeros and ones
 data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
-data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :]);
+data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
+
+println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
 ```
 
 
