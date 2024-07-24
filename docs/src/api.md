@@ -1,12 +1,6 @@
 # Functions
 
 
-## OrderedBeta()
-
-```@docs
-OrderedBeta
-```
-
 
 ## ExtremeBeta()
 
