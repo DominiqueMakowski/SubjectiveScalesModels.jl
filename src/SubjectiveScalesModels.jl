@@ -7,14 +7,15 @@ module SubjectiveScalesModels
 
 export data_rescale
 export BetaPhi2
+export Choco
 export OrderedBeta
 export ExtremeBeta
-export Choco
+
 
 include("data_rescale.jl")
 include("BetaPhi2.jl")
+include("Choco.jl")
 include("OrderedBeta.jl")
 include("ExtremeBeta.jl")
-include("Choco.jl")
 
 end

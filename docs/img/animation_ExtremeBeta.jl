@@ -43,10 +43,19 @@ ax1 = Axis(
     yticklabelsvisible=false,
 )
 
+hist!(ax1, @lift(rand(ExtremeBeta($μ, $ϕ, $k0, $k1), 40_000)), bins=200, normalization=:pdf, color=:grey)
 
+ax2 = Axis(
+    fig[2, 1],
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false,
+)
 
-hist!(ax1, @lift(rand(ExtremeBeta($μ, $ϕ, $k0, $k1), 10_000)), bins=100, normalization=:pdf)
-
+hist!(ax2, @lift(rand(ExtremeBeta($μ, $ϕ, $k0, $k1), 40_000)), bins=200, normalization=:pdf, color=:grey)
+vlines!(ax2, @lift([$k0]), color=:red)
+xlims!(ax2, 0, 0.3)
+ylims!(ax2), 0, 10
 fig
 
 
@@ -64,6 +73,7 @@ function make_animation(frame)
         k1[] = change_param(frame; frame_range=(0.7, 0.9), param_range=(0.1, 0.0))
     end
     ylims!(ax1)
+
 end
 
 # animation settings

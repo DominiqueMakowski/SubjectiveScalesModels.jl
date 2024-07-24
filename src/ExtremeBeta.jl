@@ -24,8 +24,6 @@ ExtremeBeta{Float64}(
 ϕ: 1.0
 k0: 0.0
 k1: 0.0
-beta_dist: Distributions.Beta{Float64}(α=1.0, β=1.0)
-)
 ```
 """
 struct ExtremeBeta{T<:Real} <: ContinuousUnivariateDistribution
@@ -33,22 +31,23 @@ struct ExtremeBeta{T<:Real} <: ContinuousUnivariateDistribution
     ϕ::T
     k0::T
     k1::T
-    beta_dist::Beta{T}
 
     function ExtremeBeta{T}(μ::T, ϕ::T, k0::T, k1::T) where {T<:Real}
         @assert ϕ > 0 "ϕ must be > 0"
         @assert k0 >= 0 "k0 must be >= 0"
         @assert k1 >= 0 "k1 must be >= 0"
-        new{T}(μ, ϕ, k0, k1, Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ)))
+        new{T}(μ, ϕ, k0, k1)
     end
 end
 
 ExtremeBeta(μ::T, ϕ::T, k0::T, k1::T) where {T<:Real} = ExtremeBeta{T}(μ, ϕ, k0, k1)
 
-function ExtremeBeta(μ::Real=0.5, ϕ::Real=1, k0::Real=0, k1::Real=0)
+function ExtremeBeta(μ::Real, ϕ::Real, k0::Real, k1::Real)
     T = promote_type(typeof(μ), typeof(ϕ), typeof(k0), typeof(k1))
     ExtremeBeta(T(μ), T(ϕ), T(k0), T(k1))
 end
+
+ExtremeBeta(; μ::Real=0.5, ϕ::Real=1.0, k0::Real=0.0, k1::Real=0.0) = ExtremeBeta(μ, ϕ, k0, k1)
 
 # Methods ------------------------------------------------------------------------------------------
 params(d::ExtremeBeta) = (d.μ, d.ϕ, d.k0, d.k1)
@@ -62,9 +61,9 @@ insupport(::ExtremeBeta, x::Real) = 0 ≤ x ≤ 1
 
 
 # Random -------------------------------------------------------------------------------------------
-function _logistic(x::Real)
-    return 1.0 / (1.0 + exp(-x))
-end
+# function _logistic(x::Real)
+#     return 1.0 / (1.0 + exp(-x))
+# end
 
 function _invlogistic(y::Real)
     if y <= 0 || y >= 1
@@ -96,13 +95,12 @@ function Random.rand(rng::Random.AbstractRNG, d::ExtremeBeta)
     # P(y in ]0, 1[)
     p = 1 - (p0 + p1) # P(y in ]0, 1[)
 
-    return sample([0, 1, Random.rand(rng, d.beta_dist)], Weights([p0, p1, p]))
+    return sample([0, 1, Random.rand(rng, BetaPhi2(μ, ϕ))], Weights([p0, p1, p]))
 end
 
 Random.rand(d::ExtremeBeta) = rand(Random.GLOBAL_RNG, d)
 Random.rand(rng::Random.AbstractRNG, d::ExtremeBeta, n::Int) = [rand(rng, d) for _ in 1:n]
 Random.rand(d::ExtremeBeta, n::Int) = rand(Random.GLOBAL_RNG, d, n)
-
 sampler(d::ExtremeBeta) = d
 
 # PDF -------------------------------------------------------------------------------------------

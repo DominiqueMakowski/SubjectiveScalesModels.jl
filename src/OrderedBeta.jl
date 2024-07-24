@@ -1,107 +1,175 @@
-import Distributions: Beta, ContinuousUnivariateDistribution
-import Random
-import StatsBase: sample, Weights
+using Distributions
+using Random
+
+# Internal definitions
+_log1pexp(x::Real) = log1p(exp(x))
+_logbeta(a::Real, b::Real) = lgamma(a) + lgamma(b) - lgamma(a + b)
+_logistic(x::Real) = 1 / (1 + exp(-x))
 
 
 """
     OrderedBeta(μ, ϕ, k1, k2)
 
 The distribution is defined on the interval [0, 1] with additional point masses at 0 and 1.
-It is defined as a mixture of a *Beta Phi2* distribution and two point masses at 0 and 1.
 
-# Parameters
-- `μ`: location parameter ]0, 1[
+# Arguments
+- `μ`: location parameter on the scale 0-1
 - `ϕ`: precision parameter (must be positive)
-- `k1`: first cutpoint
-- `k2`: Difference between the second and first cutpoints
+- `k1`: first cutpoint (`curzero`)
+- `k2`: log of the difference between the second and first cutpoints (`cutone`)
 
+# Details
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_OrderedBeta.gif?raw=true)
 
 # Examples
 ```jldoctest
-julia> OrderedBeta(0.5, 1)
-OrderedBeta{Float64}(
-μ: 0.5
-ϕ: 1.0
-k1: -6.0
-k2: 12.0
-beta_dist: Distributions.Beta{Float64}(α=1.0, β=1.0)
-)
+julia> OrderedBeta(0.5, 1, -6, 4)
+OrderedBeta{Float64}(μ=0.5, ϕ=1.0, k1=-6.0, k2=4.0)
 ```
-
 """
 struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
     μ::T
     ϕ::T
     k1::T
     k2::T
-    beta_dist::Beta{T}
 
     function OrderedBeta{T}(μ::T, ϕ::T, k1::T, k2::T) where {T<:Real}
         @assert ϕ > 0 "ϕ must be positive"
-        @assert k1 < k2 "k1 must be less than k2"
-        new{T}(μ, ϕ, k1, k2, Beta(μ * 2 * ϕ, 2 * ϕ * (1 - μ)))
+        new{T}(μ, ϕ, k1, k2)
     end
 end
 
 OrderedBeta(μ::T, ϕ::T, k1::T, k2::T) where {T<:Real} = OrderedBeta{T}(μ, ϕ, k1, k2)
 
-function OrderedBeta(μ::Real=0.5, ϕ::Real=1, k1::Real=-6, k2::Real=2 * abs(k1))
+function OrderedBeta(μ::Real, ϕ::Real, k1::Real, k2::Real)
     T = promote_type(typeof(μ), typeof(ϕ), typeof(k1), typeof(k2))
     OrderedBeta(T(μ), T(ϕ), T(k1), T(k2))
 end
 
-# Methods ------------------------------------------------------------------------------------------
-params(d::OrderedBeta) = (d.μ, d.ϕ, d.k1, d.k2)
-minimum(::OrderedBeta) = 0
-maximum(::OrderedBeta) = 1
-insupport(::OrderedBeta, x::Real) = 0 ≤ x ≤ 1
+OrderedBeta(; μ::Real=0.5, ϕ::Real=1, k1::Real=-6, k2::Real=4) = OrderedBeta(μ, ϕ, k1, k2)
 
-# This is probably incorrect as it doesn't take into account the zeros and ones:
-# mean(d::OrderedBeta) = logistic(d.μ)
-# var(d::OrderedBeta) = logistic(d.μ) * (1 - logistic(d.μ)) / (1 + d.ϕ)
+# Basic ------------------------------------------------------------------------------------------
+Distributions.params(d::OrderedBeta) = (d.μ, d.ϕ, d.k1, d.k2)
+Distributions.minimum(::OrderedBeta) = 0
+Distributions.maximum(::OrderedBeta) = 1
+Distributions.insupport(::OrderedBeta, x::Real) = 0 ≤ x ≤ 1
 
+function Distributions.mean(d::OrderedBeta)
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
+
+    # Probabilities for 0, 1, and (0, 1)
+    p_0 = 1 - _logistic(μ - thresh[1])
+    p_1 = _logistic(μ - thresh[2])
+    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+
+    # Mean of the Beta distribution
+    beta_mean = μ
+
+    # Weighted mean
+    return p_0 * 0 + p_middle * beta_mean + p_1 * 1
+end
+
+function Distributions.var(d::OrderedBeta)
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
+
+    # Probabilities for 0, 1, and (0, 1)
+    p_0 = 1 - _logistic(μ - thresh[1])
+    p_1 = _logistic(μ - thresh[2])
+    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+
+    # Parameters of the Beta distribution using BetaPhi2
+    beta_dist = BetaPhi2(μ, ϕ)
+    beta_mean = mean(beta_dist)
+    beta_var = var(beta_dist)
+
+    # Mean of the OrderedBeta distribution
+    orderedbeta_mean = Distributions.mean(d)
+
+    # Variance of the OrderedBeta distribution
+    var_orderedbeta = p_0 * (0 - orderedbeta_mean)^2 +
+                      p_1 * (1 - orderedbeta_mean)^2 +
+                      p_middle * (beta_mean - orderedbeta_mean)^2 +
+                      p_middle * beta_var
+
+    return var_orderedbeta
+end
 
 # Random -------------------------------------------------------------------------------------------
-# function _logistic(x::Real)
-#     return 1.0 / (1.0 + exp(-x))
-# end
+function Random.rand(rng::Random.AbstractRNG, d::OrderedBeta)
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
+    u = Random.rand(rng)
 
-# function _invlogistic(y::Real)
-#     if y <= 0 || y >= 1
-#         error("Input must be between 0 and 1 (exclusive).")
-#     end
-#     return log(y / (1.0 - y))
-# end
+    p_0 = 1 - _logistic(μ - thresh[1])
+    p_1 = _logistic(μ - thresh[2])
+    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
 
+    if u < p_0
+        return 0.0
+    elseif u < p_0 + p_middle
+        return Random.rand(rng, BetaPhi2(μ, ϕ))
+    else
+        return 1.0
+    end
+end
 
-# function Random.rand(rng::Random.AbstractRNG, d::OrderedBeta)
-#     μ, ϕ, k1, k2 = params(d)
-#     y = Random.rand(rng)
+Random.rand(d::OrderedBeta) = Random.rand(Random.GLOBAL_RNG, d)
+Random.rand(rng::Random.AbstractRNG, d::OrderedBeta, n::Int) = [Random.rand(rng, d) for _ in 1:n]
+Random.rand(d::OrderedBeta, n::Int) = rand(Random.GLOBAL_RNG, d, n)
+Distributions.sampler(d::OrderedBeta) = d
 
-#     # Probabilities (eq. 5; Kubinec, 2023)
-#     # -------------------------------------
-#     # P(y=0)
-#     if k1 == 0
-#         α = 0.0
-#     else
-#         α = _logistic(_invlogistic(k1) - _invlogistic(y))
-#     end
+# PDF -------------------------------------------------------------------------------------------
+function Distributions.logpdf(d::OrderedBeta, x::Real)
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
 
-#     # P(y=1)
-#     if k2 == 1
-#         γ = 0.0
-#     else
-#         γ = _logistic(_invlogistic(y) - _invlogistic(k2))
-#     end
+    if x == 0
+        return log1p(-_logistic(μ - thresh[1]))
+    elseif x == 1
+        return log(_logistic(μ - thresh[2]))
+    elseif 0 < x < 1
+        log_p_middle = log(_logistic(μ - thresh[1]) - _logistic(μ - thresh[2]))
+        return log_p_middle + logpdf(BetaPhi2(μ, ϕ), x)
+    else
+        return -Inf
+    end
+end
 
-#     # P(y in ]0, 1[)
-#     δ = 1 - (α + γ) # P(y in ]0, 1[)
+Distributions.pdf(d::OrderedBeta, x::Real) = exp(Distributions.logpdf(d, x))
+Distributions.loglikelihood(d::OrderedBeta, x::Real) = Distributions.logpdf(d, x)
 
-#     return sample([0, 1, Random.rand(rng, d.beta_dist)], Weights([α, γ, δ]))
-# end
+function Distributions.cdf(d::OrderedBeta, x::Real)
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
 
-# Random.rand(d::OrderedBeta) = rand(Random.GLOBAL_RNG, d)
-# Random.rand(rng::Random.AbstractRNG, d::OrderedBeta, n::Int) = [rand(rng, d) for _ in 1:n]
-# Random.rand(d::OrderedBeta, n::Int) = rand(Random.GLOBAL_RNG, d, n)
+    if x <= 0
+        return zero(μ)
+    elseif x >= 1
+        return one(μ)
+    else
+        p_0 = 1 - _logistic(μ - thresh[1])
+        p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+        return p_0 + p_middle * Distributions.cdf(BetaPhi2(μ, ϕ), x)
+    end
+end
 
-# sampler(d::OrderedBeta) = d
+function Distributions.quantile(d::OrderedBeta, q::Real)
+    0 <= q <= 1 || throw(DomainError(q, "quantile must be in [0, 1]"))
+    μ, ϕ, k1, k2 = Distributions.params(d)
+    thresh = [k1, k1 + exp(k2)]
+
+    p_0 = 1 - _logistic(μ - thresh[1])
+    p_1 = _logistic(μ - thresh[2])
+
+    if q <= p_0
+        return 0.0
+    elseif q >= 1 - p_1
+        return 1.0
+    else
+        p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+        q_adjusted = (q - p_0) / p_middle
+        return Distributions.quantile(BetaPhi2(μ, ϕ), q_adjusted)
+    end
+end
