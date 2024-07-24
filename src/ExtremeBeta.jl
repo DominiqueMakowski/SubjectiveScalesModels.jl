@@ -19,11 +19,7 @@ This is a modified version of the OrderedBeta model by Kubinec (2023).
 # Examples
 ```jldoctest
 julia> ExtremeBeta()
-ExtremeBeta{Float64}(
-μ: 0.5
-ϕ: 1.0
-k0: 0.0
-k1: 0.0
+ExtremeBeta{Float64}(μ=0.5, ϕ=1.0, k0=0.0, k1=0.0)
 ```
 """
 struct ExtremeBeta{T<:Real} <: ContinuousUnivariateDistribution

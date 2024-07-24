@@ -19,7 +19,11 @@ The distribution is defined on the interval [0, 1] with additional point masses 
 - `k2`: log of the difference between the second and first cutpoints (`cutone`)
 
 # Details
+
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_OrderedBeta.gif?raw=true)
+
+The figure above shows the parameter space for *k1* and *k2*, showing the regions that produce a large proportion of zeros and ones (in red).
+Understanding this is important to set appropriate priors on these parameters.
 
 # Examples
 ```jldoctest
