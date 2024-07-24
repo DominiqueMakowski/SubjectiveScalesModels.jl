@@ -166,7 +166,7 @@ pred = Array(pred)
 
 fig = hist(y, bins=100, color=:darkorange, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
-    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05))
+    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=1)
 end
 xlims!(0, 1)
 fig

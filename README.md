@@ -20,6 +20,12 @@ BetaPhi2(0.5, 1)
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_BetaPhi2.gif?raw=true)
 
 
+### Ordered Beta Model
+
+- [x] [**Documentation**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/OrderedBeta/)
+
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_OrderedBeta.gif?raw=true)
+
 ### Choice-Confidence (Choco) Model
 
 ```julia
@@ -30,10 +36,6 @@ Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2)
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_Choco1.gif?raw=true)
 
-
-### Ordered Beta Model
-
-- [ ] To do.
 
 
 ### Zero-One-Inflated Beta Model (ZOIB)
