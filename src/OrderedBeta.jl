@@ -46,8 +46,7 @@ end
 OrderedBeta(μ::T, ϕ::T, k1::T, k2::T) where {T<:Real} = OrderedBeta{T}(μ, ϕ, k1, k2)
 
 function OrderedBeta(μ::Real, ϕ::Real, k1::Real, k2::Real)
-    T = promote_type(typeof(μ), typeof(ϕ), typeof(k1), typeof(k2))
-    OrderedBeta(T(μ), T(ϕ), T(k1), T(k2))
+    OrderedBeta(promote(μ, ϕ, k1, k2)...)
 end
 
 OrderedBeta(; μ::Real=0.5, ϕ::Real=1, k1::Real=-6, k2::Real=4) = OrderedBeta(μ, ϕ, k1, k2)
