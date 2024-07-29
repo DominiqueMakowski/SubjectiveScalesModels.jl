@@ -26,26 +26,52 @@ Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ m
 
 In particular, *mu* $\mu$, *k1* and *k2* are typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
 
+Let us start by generating data from a distribution with *known* parameters, and then fitting a model to recover these parameters.
+
 ```@example ordbeta1
-# using RDatasets
-# using CairoMakie
-# using Turing
-# using StatsFuns: logistic
-# using SubjectiveScalesModels
+using CairoMakie
+using Turing
+using StatsFuns: logistic
+using SubjectiveScalesModels
 
+μ = 0.6
+ϕ = 2.5
+k1 = 0.05
+k2 = 0.9
 
-data = dataset("datasets", "iris")
-data.y = data.PetalWidth .- minimum(data.PetalWidth)
-data.y = data.y ./ maximum(data.y)
-data.x = data.PetalLength ./ maximum(data.PetalLength)
-
-# Inflate zeros and ones
-data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
-data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
-
-println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
+data = rand(OrderedBeta(μ, ϕ, k1, k2), 1000)
+hist(data, color=:forestgreen, normalization=:pdf, bins=25)
 ```
 
+The parameters (and their priors) are expressed on the transformed scale, and then transformed using `logistic()` or `exp()` functions before being used in the model.
+
+```@example ordbeta1
+@model function model_ordbeta(y)
+    # Priors
+    μ ~ Normal(0, 3)
+    ϕ ~ Normal(0, 3)
+    k1 ~ Normal(0, 3)
+    k2 ~ Normal(0, 3)
+
+    # Inference
+    for i in 1:length(y)
+        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(k1), logistic(k2))
+    end
+end
+
+posteriors = sample(model_ordbeta(data), NUTS(), 1000);
+```
+
+```@example ordbeta1
+means = DataFrame(mean(posteriors))
+
+table = DataFrame(
+    Parameter = means.parameters,
+    PosteriorMean = means.mean,
+    Estimate = [logistic(means.mean[1]), exp(means.mean[2]), logistic(means.mean[3]), logistic(means.mean[4])],
+    TrueValue = [μ, ϕ, k1, k2]
+)
+```
 
 ## Validation against R Implementation
 
