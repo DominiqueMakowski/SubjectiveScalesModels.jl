@@ -4,6 +4,8 @@ Data from subjective scales often exhibit clustered responses at the extremes (e
 This makes it challenging to model with regular Beta regressions.
 The Ordered Beta distribution allows for the presence of zeros and ones in an convenient way.
 
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/illustration_slider.gif?raw=true)
+
 ## Function
 
 ```@docs
@@ -13,9 +15,10 @@ OrderedBeta
 
 ## Usage
 
-TODO.
+![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/illustration_orderedbeta.png?raw=true)
 
-## Validation against Original Implementation
+
+## Validation against R Implementation
 
 ### R Output
 

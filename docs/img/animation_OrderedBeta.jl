@@ -172,3 +172,56 @@ end
 frames = range(0, 1, length=120)
 record(make_animation, fig, "animation_OrderedBeta.gif", frames; framerate=15)
 
+
+
+# Plot Example ==================================================================================
+using CSV
+using DataFrames
+using Distributions
+using GLMakie
+using Downloads
+using Random
+using SubjectiveScalesModels
+
+cd(@__DIR__)
+
+Random.seed!(121)
+
+vals = rand(OrderedBeta(0.65, 2.2, -4.3, 4.3), 3000)
+
+n_bins = 100
+bin_zero = [-1 / n_bins, eps()] # eps() is the smallest positive number to encompass zero
+bin_one = [1, 1 + 1 / n_bins]
+bins = vcat(bin_zero, range(eps(), 1, n_bins - 1), bin_one)
+
+
+fig = Figure()
+ax1 = Axis(fig[1, 1],
+    title="Typical distribution from slider scales",
+    xlabel="Score",
+    ylabel="Frequency",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false,
+)
+hist!(ax1, vals[(vals.>0).&(vals.<1)], bins=bins, color=:forestgreen)
+hist!(ax1, vals[(vals.==0).|(vals.==1)], bins=bins, color=:red)
+ylims!(ax1, 0, 72)
+
+groups = vcat(rand(Normal(0, 0.1), 1500), rand(Normal(1, 0.1), 1500))
+
+ax2 = Axis(fig[2, 1],
+    title="By group",
+    ylabel="Score",
+    yticksvisible=false,
+    xticksvisible=false,
+    xlabelvisible=false,
+    yticklabelsvisible=false, xticks=([0, 1], ["Control", "Treatment"]),
+)
+
+scatter!(ax2, groups[(vals.>0).&(vals.<1)], vals[(vals.>0).&(vals.<1)], color=(:black, 0.2))
+scatter!(ax2, groups[(vals.==0).|(vals.==1)], vals[(vals.==0).|(vals.==1)], color=(:red, 0.5))
+
+
+fig
+save("./illustration_orderedbeta.png", fig)
