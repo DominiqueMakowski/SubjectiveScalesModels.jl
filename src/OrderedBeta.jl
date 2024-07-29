@@ -19,6 +19,8 @@ The Beta distribution is specified using the [`BetaPhi2`](@ref) parametrization.
 - `k1`: first cutpoint (`cutzero`), likely lower than 0.5.
 - `k2`: second cutpoint (`cutone`), likely higher than 0.5. Must be greater than `k1`.
 
+Note that when `k1=0` and `k2=1`, the distribution is equivalent to a Beta distribution (i.e., there are no zeros or ones).
+
 # Details
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/animation_OrderedBeta.gif?raw=true)
