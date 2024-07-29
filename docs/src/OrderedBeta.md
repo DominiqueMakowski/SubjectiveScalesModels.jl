@@ -31,6 +31,7 @@ Let us start by generating data from a distribution with *known* parameters, and
 ```@example ordbeta1
 using CairoMakie
 using Turing
+using DataFrames
 using StatsFuns: logistic
 using SubjectiveScalesModels
 
