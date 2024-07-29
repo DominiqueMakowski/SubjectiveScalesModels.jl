@@ -29,8 +29,8 @@ fig = Figure(size=(1200, 800))
 
 μ = Observable(0.5)
 ϕ = Observable(3.0)
-k1 = Observable(-3.0)
-k2 = Observable(3.0)
+k1 = Observable(0.05)
+k2 = Observable(0.95)
 
 ax1 = Axis(
     fig[1:2, 5:6],
@@ -44,7 +44,11 @@ ax1 = Axis(
 
 # hist!(ax1, @lift(rand(OrderedBeta($μ, $ϕ, $k0, $k1), 40_000)), bins=1000, normalization=:pdf, color=:grey)
 xaxis = range(0, 1, length=1000)
-lines!(ax1, xaxis, @lift(pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), xaxis)), color=:red)
+band!(ax1, xaxis, [0], @lift(pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), xaxis)), color=("#F44336", 0.1))
+lines!(ax1, @lift([$k1, $k1]), @lift([0, pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), $k1)]), color=("#1E88E5", 1), linewidth=2, linestyle=:dot, label="k1")
+lines!(ax1, @lift([$k2, $k2]), @lift([0, pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), $k2)]), color=("#4CAF50", 1), linewidth=2, linestyle=:dot, label="k2")
+lines!(ax1, xaxis, @lift(pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), xaxis)), color="#E53935", linewidth=5)
+axislegend(position=:rt)
 
 
 # Contour plot -----------------------------------------------------------------------------------
@@ -67,14 +71,14 @@ ax3 = Axis(
     xticksvisible=false,
 )
 contourf!(ax3,
-    range(-6, 6, 100),
-    range(-6, 6, 100),
-    [get_pdf(k1, k2, 0) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
+    range(0, 1, 200),
+    range(0, 1, 200),
+    [get_pdf(k1, k2, 0) for k1 in range(0, 1, 200), k2 in range(0, 1, 200)],
     colormap=:amp,
-    levels=range(0, 1, length=20))
+    levels=range(0, 1, length=40))
 
-xlims!(ax3, -6, 6)
-ylims!(ax3, -6, 6)
+xlims!(ax3, 0, 1)
+ylims!(ax3, 0, 1)
 
 ax4 = Axis(
     fig[2, 1:2],
@@ -88,14 +92,14 @@ ax4 = Axis(
 
 
 contourf!(ax4,
-    range(-6, 6, 100),
-    range(-6, 6, 100),
-    [get_pdf(k1, k2, 1) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
+    range(0, 1, 200),
+    range(0, 1, 200),
+    [get_pdf(k1, k2, 1) for k1 in range(0, 1, 200), k2 in range(0, 1, 200)],
     colormap=:amp,
-    levels=range(0, 1, length=20))
+    levels=range(0, 1, length=40))
 
-xlims!(ax4, -6, 6)
-ylims!(ax4, -6, 6)
+xlims!(ax4, 0, 1)
+ylims!(ax4, 0, 1)
 
 # [(k1, k2) for k2 in range(1, 3, 3), k1 in range(4, 6, 3)]
 
@@ -114,35 +118,35 @@ xaxis = range(0, 1, length=1000)
 
 
 _make_axis(1, 3)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -2, 2), xaxis), color=:orange, label="k1 = -2, k2 = 2")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0.2, 0.8), xaxis), color=:orange, label="k1 = 0.2, k2 = 0.8")
 ylims!(0, 2)
 axislegend(position=:rt)
 _make_axis(1, 4)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0, 2), xaxis), color=:green, label="k1 = 0, k2 = 2")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0.5, 0.8), xaxis), color=:green, label="k1 = 0.5, k2 = 0.8")
 ylims!(0, 2)
 axislegend(position=:rt)
 _make_axis(2, 4)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0, 0), xaxis), color=:blue, label="k1 = 0, k2 = 0")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0.5, 0.5), xaxis), color=:blue, label="k1 = 0.5, k2 = 0.5")
 ylims!(0, 2)
 axislegend(position=:rt)
 _make_axis(2, 3)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -2, 0), xaxis), color=:purple, label="k1 = -2, k2 = 0")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0.2, 0.5), xaxis), color=:purple, label="k1 = 0.2, k2 = 0.5")
 ylims!(0, 2)
 axislegend(position=:rt)
 
 # Points
 for ax in [ax3, ax4]
-    poly!(ax, Point2f[(-2, 2), (0, 2), (0, 0), (-2, 0)], color=(:grey, 0.2))
+    poly!(ax, Point2f[(0.2, 0.8), (0.5, 0.8), (0.5, 0.5), (0.2, 0.5)], color=(:grey, 0.2))
 
-    vlines!(ax, [0], color=(:grey, 0.8), linestyle=:dash)
-    hlines!(ax, [0], color=(:grey, 0.8), linestyle=:dash)
+    vlines!(ax, [0.5], color=(:grey, 0.8), linestyle=:dash)
+    hlines!(ax, [0.5], color=(:grey, 0.8), linestyle=:dash)
 
     # arc!(ax, Point2f(-3, 2), 2, -π, π)
     scatter!(ax, @lift([$k1]), @lift([$k2]), color=:red, markersize=10)
-    scatter!(ax, [-2], [2], color=:orange, markersize=10, marker=:cross)
-    scatter!(ax, [0], [2], color=:green, markersize=10, marker=:cross)
-    scatter!(ax, [0], [0], color=:blue, markersize=10, marker=:cross)
-    scatter!(ax, [-2], [0], color=:purple, markersize=10, marker=:cross)
+    scatter!(ax, [0.2], [0.8], color=:orange, markersize=10, marker=:cross)
+    scatter!(ax, [0.5], [0.8], color=:green, markersize=10, marker=:cross)
+    scatter!(ax, [0.5], [0.5], color=:blue, markersize=10, marker=:cross)
+    scatter!(ax, [0.2], [0.5], color=:purple, markersize=10, marker=:cross)
 end
 
 
@@ -152,17 +156,17 @@ fig
 # Animation =====================================================================================
 function make_animation(frame)
     if frame < 0.2
-        k1[] = change_param(frame; frame_range=(0.0, 0.2), param_range=(-3.0, 0.0))
+        k1[] = change_param(frame; frame_range=(0.0, 0.2), param_range=(0.05, 0.5))
     end
     if frame >= 0.25 && frame < 0.45
-        k2[] = change_param(frame; frame_range=(0.25, 0.45), param_range=(3.0, 0.0))
+        k2[] = change_param(frame; frame_range=(0.25, 0.45), param_range=(0.95, 0.5))
     end
     if frame >= 0.5 && frame < 0.7
-        k1[] = change_param(frame; frame_range=(0.5, 0.70), param_range=(0.0, -3.0))
+        k1[] = change_param(frame; frame_range=(0.5, 0.70), param_range=(0.5, 0.05))
     end
     # Return to normal
     if frame >= 0.75 && frame < 0.95
-        k2[] = change_param(frame; frame_range=(0.75, 0.95), param_range=(0.0, 3.0))
+        k2[] = change_param(frame; frame_range=(0.75, 0.95), param_range=(0.5, 0.95))
     end
     ylims!(ax1)
 

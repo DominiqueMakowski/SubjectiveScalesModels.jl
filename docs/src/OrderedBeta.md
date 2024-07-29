@@ -1,6 +1,6 @@
 # Ordered Beta Regressions
 
-Data from subjective scales often exhibit clustered responses at the extremes (e.g., 0 and ones). 
+Data from subjective scales often exhibit clustered responses at the extremes (e.g., zeros and ones). 
 This makes it challenging to model with regular Beta regressions.
 The Ordered Beta distribution allows for the presence of zeros and ones in an convenient way.
 
@@ -15,7 +15,36 @@ OrderedBeta
 
 ## Usage
 
+Data with clustered extreme responses are common in psychology and cognitive neuroscience. 
+Ordered Beta models are a convenient and parsimonious way of modelling such data.
+
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/illustration_orderedbeta.png?raw=true)
+
+The model is based on a distribution with 4 parameters, 2 of which are the parameters of the [`BetaPhi2`](@ref) distribution (modeling data in between the extremes), and *k1* and *k2* delimiting fuzzy boundaries by which the probability of extreme values increases.
+
+Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k1* and *k2* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
+
+In particular, *mu* $\mu$, *k1* and *k2* are typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
+
+```@example ordbeta1
+# using RDatasets
+# using CairoMakie
+# using Turing
+# using StatsFuns: logistic
+# using SubjectiveScalesModels
+
+
+data = dataset("datasets", "iris")
+data.y = data.PetalWidth .- minimum(data.PetalWidth)
+data.y = data.y ./ maximum(data.y)
+data.x = data.PetalLength ./ maximum(data.PetalLength)
+
+# Inflate zeros and ones
+data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
+data = vcat(data, data[(data.y .== 0) .| (data.y .== 1), :])
+
+println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
+```
 
 
 ## Validation against R Implementation
@@ -99,7 +128,7 @@ println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
 
     for i in 1:length(y)
         μ = μ_intercept + μ_x * x[i]
-        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), cutzero, cutone)
+        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(cutzero), logistic(cutone))
     end
 end
 
