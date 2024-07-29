@@ -87,12 +87,12 @@ println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
 
 ```@example ordbeta2
 @model function model_ordbeta(y, x)
-    μ_intercept ~ Normal(0, 10)
-    μ_x ~ Normal(0, 10)
+    μ_intercept ~ Normal(0, 3)
+    μ_x ~ Normal(0, 3)
 
-    ϕ ~ Normal(0, 10)
-    cutzero ~ Normal(0, 20)
-    cutone ~ Normal(0, 20)
+    ϕ ~ Normal(0, 3)
+    cutzero ~ Normal(0, 3)
+    cutone ~ Normal(0, 3)
 
     for i in 1:length(y)
         μ = μ_intercept + μ_x * x[i]
@@ -102,27 +102,41 @@ end
 
 
 fit = model_ordbeta(data.y, data.x)
-posteriors = sample(fit, NUTS(), 4000)
+posteriors = sample(fit, NUTS(), 1000)
 
 # Mean posterior
 mean(posteriors)
 ```
 
+!!! danger "Important"
+    Note that due to *Stan* limitations, the R implementation has *k2* (cutone) specified as the log of the difference from *k1* (cutzero). 
+    We can convert the Julia results by doing: `log(cutone - cutzero)`.
+
+
 The parameters for *mu* μ are very similar, and that of *phi* ϕ is different (but that is expected as a different parametrization is used). 
-The values for the cut points *k1* and *k2* are also quite different...
+The values for the cut points *k1* and *k2* (after the transformation specified above) are also very similar.
 
 ```@example ordbeta2
 # Make predictions
 pred = predict(model_ordbeta([missing for _ in 1:length(data.y)], data.x), posteriors)
 pred = Array(pred)
 
-fig = hist(data.y, color=:forestgreen, normalization=:pdf, bins=80)
+n_bins = 30
+bin_zero = [-1/n_bins, eps()] # eps() is the smallest positive number to encompass zero
+bin_one = [1, 1+1/n_bins] 
+bins = vcat(bin_zero, range(eps(), 1, n_bins-1), bin_one)
+
+fig = hist(data.y, color=:forestgreen, normalization=:pdf, bins=bins)
 for i in 1:size(pred, 1) # Iterate over each draw
     # density!(pred[i, :], color=(:black, 0), strokecolor=(:crimson, 0.05), strokewidth=1)
-    hist!(pred[i, :], color=(:crimson, 0.01), bins=80)
+    hist!(pred[i, :], color=(:crimson, 0.01), normalization=:pdf, bins=bins)
 end
-xlims!(0, 1)
 fig
 ```
 
-**Conclusion**: it seems like the  Julia version generates too many extreme values, which could be related to the fact that the parameters for *k1* and *k2* are also fairly distinct from the R version.
+!!! tip "Plotting"
+    The sharp number of zeros and ones makes it hard for typical plotting approaches to accurately reflect the distribution. 
+    Density plots will tend to be very distorted at the edges (due to the Gaussian kernel used), and histograms will be dependent on the binning. One option is to specify the bin edges in a convenient way to capture the zeros and ones.
+
+
+**Conclusion**: it seems like the Julia version is working as expected as compared to the original R implementation.

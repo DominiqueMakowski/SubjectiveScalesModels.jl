@@ -5,18 +5,20 @@ using Random
 _log1pexp(x::Real) = log1p(exp(x))
 _logbeta(a::Real, b::Real) = lgamma(a) + lgamma(b) - lgamma(a + b)
 _logistic(x::Real) = 1 / (1 + exp(-x))
-
+_logit(x::Real) = log(x / (1 - x))
 
 """
     OrderedBeta(μ, ϕ, k1, k2)
 
 The distribution is defined on the interval [0, 1] with additional point masses at 0 and 1.
+The Beta distributions are defined using the [`BetaPhi2`](@ref) parametrization.
 
 # Arguments
 - `μ`: location parameter on the scale 0-1
-- `ϕ`: precision parameter (must be positive)
-- `k1`: first cutpoint (`curzero`)
-- `k2`: log of the difference between the second and first cutpoints (`cutone`)
+- `ϕ`: precision parameter (must be positive). Note that this parameter is based on the [`BetaPhi2`](@ref) reparametrization of the Beta distribution,
+    which corresponds to half the precision of the traditional Beta distribution as implemented in for example the `ordbetareg` package.
+- `k1`: first cutpoint (`cutzero`) on the logit scale (should be negative).
+- `k2`: second cutpoint (`cutone`) on the logit scale (should be positive). Must be greater than `k1`.
 
 # Details
 
@@ -61,12 +63,12 @@ Distributions.insupport(::OrderedBeta, x::Real) = 0 ≤ x ≤ 1
 
 function Distributions.mean(d::OrderedBeta)
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
 
     # Probabilities for 0, 1, and (0, 1)
-    p_0 = 1 - _logistic(μ - thresh[1])
-    p_1 = _logistic(μ - thresh[2])
-    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+    p_0 = 1 - _logistic(mu_ql - k1)
+    p_1 = _logistic(mu_ql - k2)
+    p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
 
     # Mean of the Beta distribution
     beta_mean = μ
@@ -77,12 +79,12 @@ end
 
 function Distributions.var(d::OrderedBeta)
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
 
     # Probabilities for 0, 1, and (0, 1)
-    p_0 = 1 - _logistic(μ - thresh[1])
-    p_1 = _logistic(μ - thresh[2])
-    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+    p_0 = 1 - _logistic(mu_ql - k1)
+    p_1 = _logistic(mu_ql - k2)
+    p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
 
     # Parameters of the Beta distribution using BetaPhi2
     beta_dist = BetaPhi2(μ, ϕ)
@@ -104,12 +106,12 @@ end
 # Random -------------------------------------------------------------------------------------------
 function Random.rand(rng::Random.AbstractRNG, d::OrderedBeta)
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
     u = Random.rand(rng)
 
-    p_0 = 1 - _logistic(μ - thresh[1])
-    p_1 = _logistic(μ - thresh[2])
-    p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+    p_0 = 1 - _logistic(mu_ql - k1)
+    p_1 = _logistic(mu_ql - k2)
+    p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
 
     if u < p_0
         return 0.0
@@ -128,15 +130,22 @@ Distributions.sampler(d::OrderedBeta) = d
 # PDF -------------------------------------------------------------------------------------------
 function Distributions.logpdf(d::OrderedBeta, x::Real)
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
+
+    # Calculate probabilities for the three categories
+    p_0 = 1 - _logistic(mu_ql - k1)
+    p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
+    p_1 = _logistic(mu_ql - k2)
 
     if x == 0
-        return log1p(-_logistic(μ - thresh[1]))
+        return log(p_0)
     elseif x == 1
-        return log(_logistic(μ - thresh[2]))
+        return log(p_1)
     elseif 0 < x < 1
-        log_p_middle = log(_logistic(μ - thresh[1]) - _logistic(μ - thresh[2]))
-        return log_p_middle + logpdf(BetaPhi2(μ, ϕ), x)
+        if p_middle < 0
+            return -Inf
+        end
+        return log(p_middle) + logpdf(BetaPhi2(μ, ϕ), x)
     else
         return -Inf
     end
@@ -147,15 +156,15 @@ Distributions.loglikelihood(d::OrderedBeta, x::Real) = Distributions.logpdf(d, x
 
 function Distributions.cdf(d::OrderedBeta, x::Real)
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
 
     if x <= 0
         return zero(μ)
     elseif x >= 1
         return one(μ)
     else
-        p_0 = 1 - _logistic(μ - thresh[1])
-        p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+        p_0 = 1 - _logistic(mu_ql - k1)
+        p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
         return p_0 + p_middle * Distributions.cdf(BetaPhi2(μ, ϕ), x)
     end
 end
@@ -163,17 +172,17 @@ end
 function Distributions.quantile(d::OrderedBeta, q::Real)
     0 <= q <= 1 || throw(DomainError(q, "quantile must be in [0, 1]"))
     μ, ϕ, k1, k2 = Distributions.params(d)
-    thresh = [k1, k1 + exp(k2)]
+    mu_ql = _logit(μ)
 
-    p_0 = 1 - _logistic(μ - thresh[1])
-    p_1 = _logistic(μ - thresh[2])
+    p_0 = 1 - _logistic(mu_ql - k1)
+    p_1 = _logistic(mu_ql - k2)
 
     if q <= p_0
         return 0.0
     elseif q >= 1 - p_1
         return 1.0
     else
-        p_middle = _logistic(μ - thresh[1]) - _logistic(μ - thresh[2])
+        p_middle = _logistic(mu_ql - k1) - _logistic(mu_ql - k2)
         q_adjusted = (q - p_0) / p_middle
         return Distributions.quantile(BetaPhi2(μ, ϕ), q_adjusted)
     end

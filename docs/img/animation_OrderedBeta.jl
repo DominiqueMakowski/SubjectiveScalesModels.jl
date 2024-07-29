@@ -29,8 +29,8 @@ fig = Figure(size=(1200, 800))
 
 μ = Observable(0.5)
 ϕ = Observable(3.0)
-k1 = Observable(-5.5)
-k2 = Observable(3.5)
+k1 = Observable(-3.0)
+k2 = Observable(3.0)
 
 ax1 = Axis(
     fig[1:2, 5:6],
@@ -49,6 +49,15 @@ lines!(ax1, xaxis, @lift(pdf.(OrderedBeta($μ, $ϕ, $k1, $k2), xaxis)), color=:r
 
 # Contour plot -----------------------------------------------------------------------------------
 
+
+function get_pdf(k1, k2, x)
+    if k2 > k1
+        return pdf(OrderedBeta(0.5, 3, k1, k2), x)
+    else
+        return -1
+    end
+end
+
 ax3 = Axis(
     fig[1, 1:2],
     title="Proportion of zeros",
@@ -60,9 +69,9 @@ ax3 = Axis(
 contourf!(ax3,
     range(-6, 6, 100),
     range(-6, 6, 100),
-    [pdf(OrderedBeta(0.5, 3, k1, k2), 0) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
+    [get_pdf(k1, k2, 0) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
     colormap=:amp,
-    levels=range(0, 1, length=50))
+    levels=range(0, 1, length=20))
 
 xlims!(ax3, -6, 6)
 ylims!(ax3, -6, 6)
@@ -76,12 +85,14 @@ ax4 = Axis(
     xticksvisible=false
 )
 
+
+
 contourf!(ax4,
     range(-6, 6, 100),
     range(-6, 6, 100),
-    [pdf(OrderedBeta(0.5, 3, k1, k2), 1) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
+    [get_pdf(k1, k2, 1) for k1 in range(-6, 6, 100), k2 in range(-6, 6, 100)],
     colormap=:amp,
-    levels=range(0, 1, length=50))
+    levels=range(0, 1, length=20))
 
 xlims!(ax4, -6, 6)
 ylims!(ax4, -6, 6)
@@ -102,36 +113,36 @@ end
 xaxis = range(0, 1, length=1000)
 
 
-ax = _make_axis(1, 3)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -5, 3), xaxis), color=:orange, label="k1 = -5, k2 = 3")
+_make_axis(1, 3)
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -2, 2), xaxis), color=:orange, label="k1 = -2, k2 = 2")
 ylims!(0, 2)
-axislegend(ax, position=:rt)
+axislegend(position=:rt)
 _make_axis(1, 4)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0, 3), xaxis), color=:green, label="k1 = 0, k2 = 3")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0, 2), xaxis), color=:green, label="k1 = 0, k2 = 2")
 ylims!(0, 2)
-axislegend(ax, position=:rt)
+axislegend(position=:rt)
 _make_axis(2, 4)
 lines!(xaxis, pdf.(OrderedBeta(0.5, 3, 0, 0), xaxis), color=:blue, label="k1 = 0, k2 = 0")
 ylims!(0, 2)
-axislegend(ax, position=:rt)
+axislegend(position=:rt)
 _make_axis(2, 3)
-lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -5, 2), xaxis), color=:purple, label="k1 = -5, k2 = 2")
+lines!(xaxis, pdf.(OrderedBeta(0.5, 3, -2, 0), xaxis), color=:purple, label="k1 = -2, k2 = 0")
 ylims!(0, 2)
-axislegend(ax, position=:rt)
+axislegend(position=:rt)
 
 # Points
 for ax in [ax3, ax4]
-    poly!(ax, Point2f[(-5, 3), (0, 3), (0, 0), (-5, 2)], color=(:grey, 0.2))
+    poly!(ax, Point2f[(-2, 2), (0, 2), (0, 0), (-2, 0)], color=(:grey, 0.2))
 
-    vlines!(ax, [-5], color=(:grey, 0.8), linestyle=:dash)
-    hlines!(ax, [3], color=(:grey, 0.8), linestyle=:dash)
+    vlines!(ax, [0], color=(:grey, 0.8), linestyle=:dash)
+    hlines!(ax, [0], color=(:grey, 0.8), linestyle=:dash)
 
     # arc!(ax, Point2f(-3, 2), 2, -π, π)
     scatter!(ax, @lift([$k1]), @lift([$k2]), color=:red, markersize=10)
-    scatter!(ax, [-5], [3], color=:orange, markersize=10, marker=:cross)
-    scatter!(ax, [0], [3], color=:green, markersize=10, marker=:cross)
+    scatter!(ax, [-2], [2], color=:orange, markersize=10, marker=:cross)
+    scatter!(ax, [0], [2], color=:green, markersize=10, marker=:cross)
     scatter!(ax, [0], [0], color=:blue, markersize=10, marker=:cross)
-    scatter!(ax, [-5], [2], color=:purple, markersize=10, marker=:cross)
+    scatter!(ax, [-2], [0], color=:purple, markersize=10, marker=:cross)
 end
 
 
@@ -141,18 +152,17 @@ fig
 # Animation =====================================================================================
 function make_animation(frame)
     if frame < 0.2
-        k1[] = change_param(frame; frame_range=(0.0, 0.2), param_range=(-5.5, 0.5))
+        k1[] = change_param(frame; frame_range=(0.0, 0.2), param_range=(-3.0, 0.0))
     end
     if frame >= 0.25 && frame < 0.45
-        k2[] = change_param(frame; frame_range=(0.25, 0.45), param_range=(3.5, -0.5))
+        k2[] = change_param(frame; frame_range=(0.25, 0.45), param_range=(3.0, 0.0))
     end
     if frame >= 0.5 && frame < 0.7
-        k1[] = change_param(frame; frame_range=(0.5, 0.70), param_range=(0.5, -5.5))
-        k2[] = change_param(frame; frame_range=(0.5, 0.70), param_range=(-0.5, 1.5))
+        k1[] = change_param(frame; frame_range=(0.5, 0.70), param_range=(0.0, -3.0))
     end
     # Return to normal
     if frame >= 0.75 && frame < 0.95
-        k2[] = change_param(frame; frame_range=(0.75, 0.95), param_range=(1.5, 3.5))
+        k2[] = change_param(frame; frame_range=(0.75, 0.95), param_range=(0.0, 3.0))
     end
     ylims!(ax1)
 
