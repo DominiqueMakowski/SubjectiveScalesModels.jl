@@ -8,8 +8,9 @@ _logit(x::Real) = log(x / (1 - x))
 """
     OrderedBeta(μ, ϕ, k1, k2)
 
-The distribution is defined on the interval [0, 1] with additional point masses at 0 and 1.
-The Beta distributions are defined using the [`BetaPhi2`](@ref) parametrization.
+This distribution was introduced by [Kubinec (2023)](https://doi.org/10.1017/pan.2022.20) as an appropriate and parsimonious way of describing data commonly observed in psychological science (such as from slider scales). 
+It is defined with a Beta distribution on the interval ]0, 1[ with additional point masses at 0 and 1.
+The Beta distribution is specified using the [`BetaPhi2`](@ref) parametrization.
 
 # Arguments
 - `μ`: location parameter on the scale 0-1
@@ -25,12 +26,19 @@ The Beta distributions are defined using the [`BetaPhi2`](@ref) parametrization.
 The figure above shows the parameter space for *k1* and *k2*, showing the regions that produce a large proportion of zeros and ones (in red).
 Understanding this is important to set appropriate priors on these parameters.
 
+Compared to the `ordbetareg` R package, the main difference is that:
+- *phi* ϕ (Julia version) = *phi* ϕ (R version) / 2
+- *k1* and *k2* are specified on the raw scale [0, 1], and independently (in the R package, they are specified on the logit scale and k2 is expressed as a difference from k1).
+
 
 # Examples
 ```jldoctest
 julia> OrderedBeta(0.5, 1, 0.1, 0.9)
 OrderedBeta{Float64}(μ=0.5, ϕ=1.0, k1=0.1, k2=0.9)
 ```
+
+# References
+- Kubinec, R. (2023). Ordered beta regression: a parsimonious, well-fitting model for continuous data with lower and upper bounds. Political analysis, 31(4), 519-536.
 """
 struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
     μ::T
