@@ -3,9 +3,13 @@
         # using Test
         using Distributions
 
-        _logistic(x::Real) = 1 / (1 + exp(-x))
+        x = range(0, 1, length=10)
+        logpdf.(OrderedBeta(0.5, 3, 0, 1), x) == logpdf.(BetaPhi2(0.5, 3), x)
+
 
         # Test against R -----------------------------------------------------------------------
+        _logistic(x::Real) = 1 / (1 + exp(-x))
+
         # ordbetareg::dordbeta(c(0, 1), mu = 0.5, phi = 4, cutpoints = c(-1, 1), log = FALSE)
         floor(pdf.(OrderedBeta(0.5, 1, _logistic(-1), _logistic(1)), 0); digits=6) ≈ 0.268941
         floor(pdf.(OrderedBeta(0.5, 1, _logistic(-1), _logistic(1)), 1); digits=6) ≈ 0.268941
