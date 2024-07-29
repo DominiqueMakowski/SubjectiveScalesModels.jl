@@ -62,15 +62,17 @@ function pdf_concave(d)
 end
 
 contourf!(ax2,
-    range(0.05, 0.95, 2000),
-    range(0.05, 12, 2000),
-    [pdf_concave(BetaPhi2(μ, ϕ)) for μ in range(0.05, 0.95, 2000), ϕ in range(0.05, 12, 2000)],
+    range(0.01, 0.99, 3000),
+    range(0.05, 12, 3000),
+    [pdf_concave(BetaPhi2(μ, ϕ)) for μ in range(0.01, 0.99, 3000), ϕ in range(0.05, 12, 3000)],
     colormap=:balance,
     levels=range(-1.5, 1.5, length=41))
 
 vlines!(ax2, [0.5], color=:purple)
 hlines!(ax2, [1], color=:purple)
 scatter!(ax2, @lift([$μ]), @lift([$ϕ]), color=:red, markersize=10, marker=:cross)
+xlims!(ax2, 0, 1)
+ylims!(ax2, 0, 12)
 
 
 ax3 = Axis(

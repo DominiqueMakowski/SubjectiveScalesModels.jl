@@ -7,6 +7,14 @@
 
 Toolbox for modelling scores from subjective scales (for example Likert or analog scales), common in psychology and cognitive neuroscience.
 
+## Installation
+
+```julia
+using Pkg
+
+Pkg.add("SubjectiveScalesModels")
+```
+
 ## Features
 
 ### BetaPhi2() Distribution for Beta Regressions
