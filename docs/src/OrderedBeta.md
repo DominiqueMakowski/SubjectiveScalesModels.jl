@@ -25,9 +25,8 @@ The model is based on a distribution with 4 parameters, 2 of which are the param
 Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k0* and *k1* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
 
 In particular, *mu* $\mu$ is typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
-*k0* and *k1* can also be expressed on the logit scale, however, because 0 and 1 are totally plausible values for *k0* and *k1* (corresponding to an absence of extreme values), and 0.5 are in general the upper and lower limits, respectively, it is often more convenient to set the priors as **truncated** distributions. 
-
-
+*k0* and *k1* can also be expressed on the logit scale, and it is recommended in particular when they are the result of a formula, i.e., when there are *effects* specified on them.
+However, because 0 and 1 are totally plausible values for *k0* and *k1* (corresponding to an absence of extreme values), and 0.5 are in general the upper and lower limits, respectively, it can be convenient to set the priors as **truncated** distributions directly on the raw scale. 
 
 Let us start by generating data from a distribution with *known* parameters, and then fitting a model to recover these parameters.
 
