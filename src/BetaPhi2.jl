@@ -36,10 +36,6 @@ struct BetaPhi2{T<:Real} <: Distributions.ContinuousUnivariateDistribution
     # beta_dist::Distributions.Beta{T}
 
     function BetaPhi2{T}(μ::T, ϕ::T) where {T<:Real}
-        if (ϕ <= 0)
-            throw(DomainError(ϕ, "ϕ must be > 0"))
-        end
-
         # The test below allows for μ to be == 0 or 1 to prevent logpdf from throwing an error
         if (μ < 0) || (μ > 1)
             throw(DomainError(μ, "μ must be > 0 and < 1"))
@@ -80,7 +76,7 @@ Random.rand(d::BetaPhi2, n::Int) = rand(Random.GLOBAL_RNG, d, n)
 # PDF -------------------------------------------------------------------------------------------
 Distributions.pdf(d::BetaPhi2, x::Real) = Distributions.pdf(_BetaPhi2(d.μ, d.ϕ), x)
 function Distributions.logpdf(d::BetaPhi2, x::Real)
-    if (d.μ <= eps()) | (d.μ >= 1 - eps())
+    if (d.μ <= eps()) | (d.μ >= 1 - eps()) | (d.ϕ < eps())
         return -Inf
     end
     return Distributions.logpdf(_BetaPhi2(d.μ, d.ϕ), x)
