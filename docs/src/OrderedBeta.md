@@ -15,18 +15,15 @@ OrderedBeta
 
 ## Usage
 
+### Simulate Data
+
 Data with clustered extreme responses are common in psychology and cognitive neuroscience. 
 Ordered Beta models are a convenient and parsimonious way of modelling such data.
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/illustration_orderedbeta.png?raw=true)
 
-The model is based on a distribution with 4 parameters, 2 of which are the parameters of the [`BetaPhi2`](@ref) distribution (modeling data in between the extremes), and *k0* and *k1* delimiting fuzzy boundaries by which the probability of extreme values increases.
+The model is based on a distribution with 4 parameters, 2 of which are the parameters of the [`BetaPhi2`](@ref) distribution (modeling data in between the extremes), and *k0* and *k1* delimiting fuzzy boundaries beyond which the probability of extreme values increases.
 
-Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k0* and *k1* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
-
-In particular, *mu* $\mu$ is typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
-*k0* and *k1* can also be expressed on the logit scale, and it is recommended in particular when they are the result of a formula, i.e., when there are *effects* specified on them.
-However, because 0 and 1 are totally plausible values for *k0* and *k1* (corresponding to an absence of extreme values), and 0.5 are in general the upper and lower limits, respectively, it can be convenient to set the priors as **truncated** distributions directly on the raw scale. 
 
 Let us start by generating data from a distribution with *known* parameters, and then fitting a model to recover these parameters.
 
@@ -46,19 +43,108 @@ data = rand(OrderedBeta(μ, ϕ, k0, k1), 1000)
 hist(data, color=:forestgreen, normalization=:pdf, bins=25)
 ```
 
+### Prior Specification 
+
+!!! tip "Summary"
+    We recommend the following priors:
+    ```
+    μ ~ Normal(0, 1)  # Logit scale
+    ϕ ~ Normal(0, 1)  # Log scale
+    k0 ~ -Gamma(3, 3)  # Logit scale
+    k1 ~ Gamma(3, 3)  # Logit scale
+    ```
+
+
+Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k0* and *k1* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
+
+In particular, *mu* $\mu$ is typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale (see [**here**](https://dominiquemakowski.github.io/SubjectiveScalesModels.jl/dev/BetaPhi2/#Prior-Specification) for details).
+
+Priors for the cut points require a bit more thought. They share the same constraints as *mu* $\mu$ (must be on the 0-1 scale), which lends itself to being expressed on the logit scale and then transformed back using the logistic function. However, additionally, we would like to ensure that *k0* < *k1* (i.e., the lower boundary is lower than the upper boundary). 
+This can be achieved by setting a prior for *k0* that will have an upper bound at 0 (on the logit scale, corresponding to 0.5 on the raw scale) and a prior for *k1* that will have 0 as its lower bound. 
+In other words, we force the *k0* to be between 0 and 0.5 and *k1* to be between 0.5 and 1, which also solves the issue of k1 being smaller than k0.
+
+This can be achieved using the $Gamma$ and "minus" Gamma distributions (its mirrored version).
+We can then pick a shape of the Gamma distribution that maximizes the probability on values lower than 0.05 for *k0* and higher than 0.95 for *k1* (which is within the typical range in psychological science), such as $Gamma(3, 3)$ and $-Gamma(3, 3)$ (which mode is "6", i.e., ~0.998 on the raw scale).
+
+
+```@raw html
+<details><summary>See code</summary>
+```
+
+```@example ordbeta1
+using StatsFuns: logit
+
+k0 = -Gamma(3, 3)
+k1 = Gamma(3, 3)
+
+fig =  Figure(size = (850, 600))
+
+ax1 = Axis(fig[1, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Prior on k0",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+
+xaxis1 = range(-30, 30, 1000)
+vlines!(ax1, [0], color=:red, linestyle=:dash, linewidth=1)
+vlines!(ax1, logit.([0.05]), color=:black, linestyle=:dot, linewidth=1)
+lines!(ax1, xaxis1, pdf.(k0, xaxis1), color=:purple, linewidth=2, label="k0 ~ -Gamma(3, 3)")
+axislegend(ax1; position=:rt)
+
+ax2 = Axis(fig[1, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax2, [0.05], color=:black, linestyle=:dot, linewidth=1)
+lines!(ax2, logistic.(xaxis1), pdf.(k0, xaxis1), color=:purple, linewidth=2, label="k0")
+
+ax3 = Axis(fig[2, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Prior on k1",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax3, [0], color=:red, linestyle=:dash, linewidth=1)
+vlines!(ax3, logit.([0.95]), color=:black, linestyle=:dot, linewidth=1)
+lines!(ax3, xaxis1, pdf.(k1, xaxis1), color=:green, linewidth=2, label="k1 ~ Gamma(3, 3)")
+axislegend(ax3; position=:rt)
+
+ax4 = Axis(fig[2, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax4, [0.95], color=:black, linestyle=:dot, linewidth=1)
+lines!(ax4, logistic.(xaxis1), pdf.(k1, xaxis1), color=:green, linewidth=2, label="k1")
+
+fig[0, :] = Label(fig, "Priors for Cut Points in Ordered Beta Regressions", fontsize=20, color=:black, font=:bold)
+fig;
+```
+```@raw html
+</details>
+```
+
+```@example ordbeta1
+fig  # hide
+```
+
+### Bayesian Model with Turing
+
 The parameters (and their priors) are expressed on the transformed scale, and then transformed using `logistic()` or `exp()` functions before being used in the model.
 
 ```@example ordbeta1
 @model function model_ordbeta(y)
     # Priors
-    μ ~ Normal(0, 3)
-    ϕ ~ Normal(0, 3)
-    k0 ~ truncated(Normal(0, 0.1), 0, 0.5)
-    k1 ~ truncated(Normal(1, 0.1), 0.5, 1)
+    μ ~ Normal(0, 1)
+    ϕ ~ Normal(0, 1)
+    k0 ~ -Gamma(3, 3)
+    k1 ~ Gamma(3, 3)
 
     # Inference
     for i in 1:length(y)
-        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), k0, k1)
+        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(k0), logistic(k1))
     end
 end
 
@@ -71,7 +157,7 @@ means = DataFrame(mean(posteriors))
 table = DataFrame(
     Parameter = means.parameters,
     PosteriorMean = means.mean,
-    Estimate = [logistic(means.mean[1]), exp(means.mean[2]), means.mean[3], means.mean[4]],
+    Estimate = [logistic(means.mean[1]), exp(means.mean[2]), logistic(means.mean[3]), logistic(means.mean[4])],
     TrueValue = [μ, ϕ, k0, k1]
 )
 ```
@@ -152,8 +238,8 @@ println("N-zero: ", sum(data.y .== 0) ,  ", N-one: ", sum(data.y .== 1))
     μ_x ~ Normal(0, 3)
 
     ϕ ~ Normal(0, 3)
-    cutzero ~ Normal(0, 3)
-    cutone ~ Normal(0, 3)
+    cutzero ~ Normal(-3, 3)
+    cutone ~ Normal(3, 3)
 
     for i in 1:length(y)
         μ = μ_intercept + μ_x * x[i]
