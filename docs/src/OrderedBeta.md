@@ -20,11 +20,11 @@ Ordered Beta models are a convenient and parsimonious way of modelling such data
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/illustration_orderedbeta.png?raw=true)
 
-The model is based on a distribution with 4 parameters, 2 of which are the parameters of the [`BetaPhi2`](@ref) distribution (modeling data in between the extremes), and *k1* and *k2* delimiting fuzzy boundaries by which the probability of extreme values increases.
+The model is based on a distribution with 4 parameters, 2 of which are the parameters of the [`BetaPhi2`](@ref) distribution (modeling data in between the extremes), and *k0* and *k1* delimiting fuzzy boundaries by which the probability of extreme values increases.
 
-Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k1* and *k2* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
+Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k0* and *k1* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
 
-In particular, *mu* $\mu$, *k1* and *k2* are typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
+In particular, *mu* $\mu$, *k0* and *k1* are typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
 
 Let us start by generating data from a distribution with *known* parameters, and then fitting a model to recover these parameters.
 
@@ -37,10 +37,10 @@ using SubjectiveScalesModels
 
 μ = 0.6
 ϕ = 2.5
-k1 = 0.05
-k2 = 0.9
+k0 = 0.05
+k1 = 0.9
 
-data = rand(OrderedBeta(μ, ϕ, k1, k2), 1000)
+data = rand(OrderedBeta(μ, ϕ, k0, k1), 1000)
 hist(data, color=:forestgreen, normalization=:pdf, bins=25)
 ```
 
@@ -51,12 +51,12 @@ The parameters (and their priors) are expressed on the transformed scale, and th
     # Priors
     μ ~ Normal(0, 3)
     ϕ ~ Normal(0, 3)
+    k0 ~ Normal(0, 3)
     k1 ~ Normal(0, 3)
-    k2 ~ Normal(0, 3)
 
     # Inference
     for i in 1:length(y)
-        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(k1), logistic(k2))
+        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(k0), logistic(k1))
     end
 end
 
@@ -70,7 +70,7 @@ table = DataFrame(
     Parameter = means.parameters,
     PosteriorMean = means.mean,
     Estimate = [logistic(means.mean[1]), exp(means.mean[2]), logistic(means.mean[3]), logistic(means.mean[4])],
-    TrueValue = [μ, ϕ, k1, k2]
+    TrueValue = [μ, ϕ, k0, k1]
 )
 ```
 
@@ -168,12 +168,12 @@ mean(posteriors)
 ```
 
 !!! danger "Important"
-    Note that due to *Stan* limitations, the R implementation has *k2* (cutone) specified as the log of the difference from *k1* (cutzero). 
+    Note that due to *Stan* limitations, the R implementation has *k1* (cutone) specified as the log of the difference from *k0* (cutzero). 
     We can convert the Julia results by doing: `log(cutone - cutzero)`.
 
 
 The parameters for *mu* μ are very similar, and that of *phi* ϕ is different (but that is expected as a different parametrization is used). 
-The values for the cut points *k1* and *k2* (after the transformation specified above) are also very similar.
+The values for the cut points *k0* and *k1* (after the transformation specified above) are also very similar.
 
 ```@example ordbeta2
 # Make predictions
