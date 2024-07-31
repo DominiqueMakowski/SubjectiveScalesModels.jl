@@ -49,9 +49,6 @@ struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
     k1::T
 
     function OrderedBeta{T}(μ::T, ϕ::T, k0::T, k1::T) where {T<:Real}
-        if (ϕ <= 0)
-            throw(DomainError(ϕ, "ϕ must be > 0"))
-        end
         new{T}(μ, ϕ, k0, k1)
     end
 end

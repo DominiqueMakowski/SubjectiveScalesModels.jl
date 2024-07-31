@@ -50,18 +50,6 @@ struct Choco{T<:Real} <: Distributions.ContinuousUnivariateDistribution
     ϕ_mid::T
 
     function Choco{T}(p1::T, μ0::T, ϕ0::T, μ1::T, ϕ1::T, p_mid::T, ϕ_mid::T) where {T<:Real}
-        if (ϕ0 <= 0)
-            throw(DomainError(ϕ0, "ϕ must be > 0"))
-        end
-        if (μ0 < 0) || (μ0 > 1)
-            throw(DomainError(μ0, "μ must be > 0 and < 1"))
-        end
-        if (ϕ1 <= 0)
-            throw(DomainError(ϕ1, "ϕ must be > 0"))
-        end
-        if (μ1 < 0) || (μ1 > 1)
-            throw(DomainError(μ1, "μ must be > 0 and < 1"))
-        end
         new{T}(p1, μ0, ϕ0, μ1, ϕ1, p_mid, ϕ_mid)
     end
 end
