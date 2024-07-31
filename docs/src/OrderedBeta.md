@@ -158,7 +158,7 @@ table = DataFrame(
     Parameter = means.parameters,
     PosteriorMean = means.mean,
     Estimate = [logistic(means.mean[1]), exp(means.mean[2]), logistic(means.mean[3]), logistic(means.mean[4])],
-    TrueValue = [μ, ϕ, k0, k1]
+    TrueValue = [0.6, 2.5, 0.05, 0.9]
 )
 ```
 
