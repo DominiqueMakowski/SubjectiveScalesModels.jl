@@ -24,7 +24,10 @@ The model is based on a distribution with 4 parameters, 2 of which are the param
 
 Because these 4 parameters come with their own constraints (i.e., *phi* $\phi$ must be positive, *mu* $\mu$, *k0* and *k1* must be between 0 and 1), it is convenient to express them on a transformed scale (in which they become unconstrained and can adopt any values).
 
-In particular, *mu* $\mu$, *k0* and *k1* are typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
+In particular, *mu* $\mu$ is typically expressed on the **logit** scale, and *phi* $\phi$ is expressed on the log scale.
+*k0* and *k1* can also be expressed on the logit scale, however, because 0 and 1 are totally plausible values for *k0* and *k1* (corresponding to an absence of extreme values), and 0.5 are in general the upper and lower limits, respectively, it is often more convenient to set the priors as **truncated** distributions. 
+
+
 
 Let us start by generating data from a distribution with *known* parameters, and then fitting a model to recover these parameters.
 
@@ -51,12 +54,12 @@ The parameters (and their priors) are expressed on the transformed scale, and th
     # Priors
     μ ~ Normal(0, 3)
     ϕ ~ Normal(0, 3)
-    k0 ~ Normal(0, 3)
-    k1 ~ Normal(0, 3)
+    k0 ~ truncated(Normal(0, 0.1), 0, 0.5)
+    k1 ~ truncated(Normal(1, 0.1), 0.5, 1)
 
     # Inference
     for i in 1:length(y)
-        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), logistic(k0), logistic(k1))
+        y[i] ~ OrderedBeta(logistic(μ), exp(ϕ), k0, k1)
     end
 end
 
@@ -69,7 +72,7 @@ means = DataFrame(mean(posteriors))
 table = DataFrame(
     Parameter = means.parameters,
     PosteriorMean = means.mean,
-    Estimate = [logistic(means.mean[1]), exp(means.mean[2]), logistic(means.mean[3]), logistic(means.mean[4])],
+    Estimate = [logistic(means.mean[1]), exp(means.mean[2]), means.mean[3], means.mean[4]],
     TrueValue = [μ, ϕ, k0, k1]
 )
 ```
