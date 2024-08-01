@@ -5,6 +5,17 @@
 
         x = range(0, 1, length=10)
         logpdf.(OrderedBeta(0.5, 3, 0, 1), x) == logpdf.(BetaPhi2(0.5, 3), x)
+        logpdf(OrderedBeta(0.5, 3, 0, 1), 0.3) == logpdf(1 + OrderedBeta(0.5, 3, 0, 1), 1.3)
+
+        # logpdf at bounds
+        logpdf(OrderedBeta(0.5, 3, 0, 1), 0) ≈ -Inf
+        logpdf(OrderedBeta(0.5, 3, 0, 1), 1) ≈ -Inf
+        floor(logpdf(OrderedBeta(0.5, 3, 0.1, 1), 0); digits=5) ≈ -2.30259
+        floor(logpdf(OrderedBeta(0.5, 3, 0, 0.9), 1); digits=5) ≈ -2.30259
+
+        logpdf(0.5 * OrderedBeta(0.5, 3, 0, 1), 0) ≈ -Inf
+        floor(logpdf(0.5 * OrderedBeta(0.5, 3, 0.1, 1), 0); digits=5) ≈ -1.60944
+
 
 
         # Test against R -----------------------------------------------------------------------
