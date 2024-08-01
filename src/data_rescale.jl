@@ -28,7 +28,7 @@ julia> data_rescale([1, 2, 3]; old_range=[1, 6], new_range=[1, 0])
  0.6
 ```
 """
-function data_rescale(x::Vector{T}; old_range::Vector{T}=[minimum(x), maximum(x)], new_range::Vector{T}=[0, 1]) where {T<:Number}
+function data_rescale(x::Vector{<:Real}; old_range::Vector{<:Real}=[minimum(x), maximum(x)], new_range::Vector{<:Real}=[0, 1])
     return (x .- old_range[1]) ./ (old_range[2] - old_range[1]) .* (new_range[2] - new_range[1]) .+ new_range[1]
 end
 
