@@ -34,8 +34,12 @@ Random.seed!(123)
 
 y = rand(BetaPhi2(μ=0.7, ϕ=3.0), 1000)
 
-hist(y, bins=100, color=:dodgerblue, normalization=:pdf)
+hist(y, bins=beta_bins(30), color=:dodgerblue, normalization=:pdf)
 ```
+
+!!! tip "Code tip"
+    We use the `beta_bins(n_bins)` function to conveniently visualize Beta distributions.
+
 
 
 ### Prior Specification
@@ -135,7 +139,7 @@ Let us do a **Posterior Predictive Check** which involves the generation of pred
 pred = predict(model_beta([missing for _ in 1:length(y)]), posteriors)
 pred = Array(pred)
 
-fig = hist(y, bins=100, color=:dodgerblue, normalization=:pdf)
+fig = hist(y, bins=beta_bins(30), color=:dodgerblue, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
     density!(pred[i, :], color=(:black, 0), strokecolor=(:crimson, 0.05), strokewidth=1)
 end

@@ -40,7 +40,7 @@ k0 = 0.05
 k1 = 0.9
 
 data = rand(OrderedBeta(μ, ϕ, k0, k1), 1000)
-hist(data, color=:forestgreen, normalization=:pdf, bins=25)
+hist(data, color=:forestgreen, normalization=:pdf, bins=beta_bins(30))
 ```
 
 ### Prior Specification 
@@ -268,22 +268,17 @@ The values for the cut points *k0* and *k1* (after the transformation specified 
 pred = predict(model_ordbeta([missing for _ in 1:length(data.y)], data.x), posteriors)
 pred = Array(pred)
 
-n_bins = 30
-bin_zero = [-1/n_bins, eps()] # eps() is the smallest positive number to encompass zero
-bin_one = [1, 1+1/n_bins] 
-bins = vcat(bin_zero, range(eps(), 1, n_bins-1), bin_one)
-
-fig = hist(data.y, color=:forestgreen, normalization=:pdf, bins=bins)
+fig = hist(data.y, color=:forestgreen, normalization=:pdf, bins=beta_bins(20))
 for i in 1:size(pred, 1) # Iterate over each draw
     # density!(pred[i, :], color=(:black, 0), strokecolor=(:crimson, 0.05), strokewidth=1)
-    hist!(pred[i, :], color=(:crimson, 0.01), normalization=:pdf, bins=bins)
+    hist!(pred[i, :], color=(:crimson, 0.01), normalization=:pdf, bins=beta_bins(20))
 end
 fig
 ```
 
 !!! tip "Plotting"
     The sharp number of zeros and ones makes it hard for typical plotting approaches to accurately reflect the distribution. 
-    Density plots will tend to be very distorted at the edges (due to the Gaussian kernel used), and histograms will be dependent on the binning. One option is to specify the bin edges in a convenient way to capture the zeros and ones.
+    Density plots will tend to be very distorted at the edges (due to the Gaussian kernel used), and histograms will be dependent on the binning. One option is to specify the bin edges in a convenient way to capture the zeros and ones (which is what the `beta_bins` function does).
 
 
 **Conclusion**: it seems like the Julia version is working as expected as compared to the original R implementation.
