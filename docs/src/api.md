@@ -1,5 +1,10 @@
 # Other Functions
 
+## beta_bins()
+
+```@docs
+beta_bins
+```
 
 ## data_rescale()
 
