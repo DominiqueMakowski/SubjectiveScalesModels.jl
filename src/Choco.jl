@@ -58,8 +58,7 @@ end
 Choco(p1::T, μ0::T, ϕ0::T, μ1::T, ϕ1::T, p_mid::T, ϕ_mid::T) where {T<:Real} = Choco{T}(p1, μ0, ϕ0, μ1, ϕ1, p_mid, ϕ_mid)
 
 function Choco(p1::Real, μ0::Real, ϕ0::Real, μ1::Real, ϕ1::Real, p_mid::Real, ϕ_mid::Real)
-    T = promote_type(typeof(p1), typeof(μ0), typeof(ϕ0), typeof(μ1), typeof(ϕ1), typeof(p_mid), typeof(ϕ_mid))
-    return Choco(T(p1), T(μ0), T(ϕ0), T(μ1), T(ϕ1), T(p_mid), T(ϕ_mid))
+    return Choco(promote(p1, μ0, ϕ0, μ1, ϕ1, p_mid, ϕ_mid)...)
 end
 
 Choco(; p1::Real=0.5, μ0::Real=0.5, ϕ0::Real=1, μ1::Real=0.5, ϕ1::Real=1, p_mid::Real=0, ϕ_mid::Real=100) = Choco(p1, μ0, ϕ0, μ1, ϕ1, p_mid, ϕ_mid)
