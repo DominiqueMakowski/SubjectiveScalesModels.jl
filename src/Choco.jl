@@ -82,7 +82,10 @@ Choco(p1::Real, μ0::Real, ϕ0::Real, μ1::Real, ϕ1::Real; p_mid::Real=0, ϕ_mi
 
 # Definition ----------------------------------------------------------------------------------------
 function _Choco(p1::Real, μ0::Real, ϕ0::Real, μ1::Real, ϕ1::Real, p_mid::Real, ϕ_mid::Real, k0::Real, k1::Real)
-    p_tot = 1 - p_mid
+    p_tot = 1.0 - p_mid
+    if isprobvec([p_tot - p1 * p_tot, p_tot * p1, p_mid]) == false
+        println([p_tot - p1 * p_tot, p_tot * p1, p_mid])
+    end
     return Distributions.MixtureModel(
         [
             0.5 + (-0.5 * OrderedBeta(μ0, ϕ0, 0.0, 1.0 - k0)),

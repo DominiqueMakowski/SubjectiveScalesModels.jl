@@ -133,7 +133,7 @@ fig  # hide
 ```
 
 
-### Bayesian Model with Turing
+### Bayesian Choco Model with Turing
 
 ```@example choco1
 @model function model_choco(y)
@@ -164,9 +164,8 @@ pred = Array(pred)
 
 fig = hist(y, bins=beta_bins(30), color=:darkorange, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
-    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=1)
+    hist!(pred[i, :], bins=beta_bins(30), color=(:dodgerblue, 0.005), normalization=:pdf)
 end
-xlims!(0, 1)
 fig
 ```
 
@@ -215,13 +214,13 @@ hist(y, bins=beta_bins(31),  normalization=:pdf, color=:darkblue)
 
 !!! tip "Summary"
     We recommend the following priors:
-    - $p1 ~ Normal(0, 2)$: On the logit scale.
-    - $μ0, μ1 ~ Normal(0, 1)$: On the logit scale. Assign maximum mass to the middle of the choices.
-    - $ϕ0, ϕ1 ~ Normal(0, 1)$: On the log scale. Assign maximum mass to 1 after exponential transformation (flat distribution).
-    - $p_mid ~ Normal(-3, 1)$: On the logit scale.  Assign more mass to low probabilities of mid-point responses.
-    - $ϕ_mid ~ Gamma(22, 0.22)$: On the log scale. Gamma distribution (> 0) that prevents any values below 1 (which would lead to an unidentifiable distribution). A $Gamma(22, 0.22)$ that has a mode of ~100 after exponential transformation is an alternative in case truncated priors are not supported.
-    - $k0 ~ -Gamma(3, 3)$:  On the logit scale. Prevents values below 0.5 (after logistic transformation).
-    - $k1 ~ Gamma(3, 3)$: On the logit scale. Prevents values above 0.5 (after logistic transformation).
+    - **p1 ~ Normal(0, 2)**: On the logit scale.
+    - **μ0, μ1 ~ Normal(0, 1)**: On the logit scale. Assign maximum mass to the middle of the choices.
+    - **ϕ0, ϕ1 ~ Normal(0, 1)**: On the log scale. Assign maximum mass to 1 after exponential transformation (flat distribution).
+    - **p_mid ~ Normal(-3, 1)**: On the logit scale.  Assign more mass to low probabilities of mid-point responses.
+    - **ϕ_mid ~ Gamma(22, 0.22)**: On the log scale. Gamma distribution (> 0) that prevents any values below 1 (which would lead to an unidentifiable distribution). A **Gamma(22, 0.22)** that has a mode of ~100 after exponential transformation is an alternative in case truncated priors are not supported.
+    - **k0 ~ -Gamma(3, 3)**:  On the logit scale. Prevents values below 0.5 (after logistic transformation).
+    - **k1 ~ Gamma(3, 3)**: On the logit scale. Prevents values above 0.5 (after logistic transformation).
 
 ```@raw html
 <details><summary>See code</summary>
@@ -366,4 +365,43 @@ fig;
 
 ```@example choco2
 fig  # hide
+```
+
+### Bayesian Full Choco Model with Turing
+
+```@example choco2
+@model function model_choco(y)
+    p1 ~ Normal(0, 2)
+    μ0 ~ Normal(0, 1)
+    μ1 ~ Normal(0, 1)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 1)
+    # p_mid ~ Normal(-3, 1)
+    # ϕ_mid ~ truncated(Normal(5, 0.5); lower=0)
+    k0 ~ -Gamma(3, 3)
+    k1 ~ Gamma(3, 3)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1), 0.0, 200, logistic(k0), logistic(k1))
+    end
+end
+
+fit_choco = model_choco(y)
+posteriors = sample(fit_choco, NUTS(), 500,
+    initial_params=[0, 0, 0, 0, 0, -9, 9])
+```
+
+Making inference on *p_mid* and *ϕ_mid* is challenging and requires a lot of data.
+It currently **fails** if we set *p_mid* to anything else than zero.
+
+```@example choco2
+# Make predictions
+pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
+pred = Array(pred)
+
+fig = hist(y, bins=beta_bins(31), color=:darkblue, normalization=:pdf)
+for i in 1:size(pred, 1) # Iterate over each draw
+    hist!(pred[i, :], bins=beta_bins(31), color=(:darkorange, 0.01), normalization=:pdf)
+end
+fig
 ```
