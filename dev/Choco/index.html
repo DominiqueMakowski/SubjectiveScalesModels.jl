@@ -10,7 +10,7 @@ p_mid: 0.0
 ϕ_mid: 100.0
 k0: 0.0
 k1: 1.0
-)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/5848528e4ca8ccfd35427c7493ca525d3c20cb25/src/Choco.jl#L5-L54">source</a></section></article><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><h3 id="Simulate-Data"><a class="docs-heading-anchor" href="#Simulate-Data">Simulate Data</a><a id="Simulate-Data-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-Data" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>You can use <code>rand(dist, n)</code> to generate <em>n</em> observations from a <code>Choco()</code> distribution with pre-specified parameters.</p></div></div><p>Let&#39;s generate some data from a <code>Choco()</code> distribution with known parameters that we are going to try to recover using Bayesian modelling.</p><pre><code class="language-julia hljs">using DataFrames
+)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/058df642066fbe4d3aab04b725a82ab0307961f9/src/Choco.jl#L5-L54">source</a></section></article><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><h3 id="Simulate-Data"><a class="docs-heading-anchor" href="#Simulate-Data">Simulate Data</a><a id="Simulate-Data-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-Data" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>You can use <code>rand(dist, n)</code> to generate <em>n</em> observations from a <code>Choco()</code> distribution with pre-specified parameters.</p></div></div><p>Let&#39;s generate some data from a <code>Choco()</code> distribution with known parameters that we are going to try to recover using Bayesian modelling.</p><pre><code class="language-julia hljs">using DataFrames
 using Random
 using Turing
 using CairoMakie
@@ -87,7 +87,7 @@ lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label=&
 xlims!(ax6, 0, 10)
 
 fig[0, :] = Label(fig, &quot;Priors Example for Choco Models&quot;, fontsize=20, color=:black, font=:bold)
-fig;</code></pre><img src="ae011330.png" alt="Example block output"/></details><img src="ae011330-001.png" alt="Example block output"/><h3 id="Bayesian-Model-with-Turing"><a class="docs-heading-anchor" href="#Bayesian-Model-with-Turing">Bayesian Model with Turing</a><a id="Bayesian-Model-with-Turing-1"></a><a class="docs-heading-anchor-permalink" href="#Bayesian-Model-with-Turing" title="Permalink"></a></h3><pre><code class="language-julia hljs">@model function model_choco(y)
+fig;</code></pre><img src="ae011330.png" alt="Example block output"/></details><img src="ae011330-001.png" alt="Example block output"/><h3 id="Bayesian-Choco-Model-with-Turing"><a class="docs-heading-anchor" href="#Bayesian-Choco-Model-with-Turing">Bayesian Choco Model with Turing</a><a id="Bayesian-Choco-Model-with-Turing-1"></a><a class="docs-heading-anchor-permalink" href="#Bayesian-Choco-Model-with-Turing" title="Permalink"></a></h3><pre><code class="language-julia hljs">@model function model_choco(y)
     p1 ~ Normal(0, 2)
     μ0 ~ Normal(0, 1)
     μ1 ~ Normal(0, 0.8)
@@ -118,10 +118,9 @@ pred = Array(pred)
 
 fig = hist(y, bins=beta_bins(30), color=:darkorange, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
-    density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=1)
+    hist!(pred[i, :], bins=beta_bins(30), color=(:dodgerblue, 0.005), normalization=:pdf)
 end
-xlims!(0, 1)
-fig</code></pre><img src="9225ccdc.png" alt="Example block output"/><h3 id="Recover-Parameters"><a class="docs-heading-anchor" href="#Recover-Parameters">Recover Parameters</a><a id="Recover-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Recover-Parameters" title="Permalink"></a></h3><pre><code class="language-julia hljs">posterior_mean = DataFrame(mean(posteriors))
+fig</code></pre><img src="67d7baa0.png" alt="Example block output"/><h3 id="Recover-Parameters"><a class="docs-heading-anchor" href="#Recover-Parameters">Recover Parameters</a><a id="Recover-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Recover-Parameters" title="Permalink"></a></h3><pre><code class="language-julia hljs">posterior_mean = DataFrame(mean(posteriors))
 
 # Format
 results = DataFrame(
@@ -148,7 +147,7 @@ Random.seed!(123)
 
 y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2, p_mid=0.15, ϕ_mid=200, k0=0.1, k1=0.95), 10_000)
 
-hist(y, bins=beta_bins(31),  normalization=:pdf, color=:darkblue)</code></pre><img src="4e4b1039.png" alt="Example block output"/><h3 id="Prior-Specification-2"><a class="docs-heading-anchor" href="#Prior-Specification-2">Prior Specification</a><a class="docs-heading-anchor-permalink" href="#Prior-Specification-2" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>We recommend the following priors:</p><ul><li><p class="math-container">\[p1 ~ Normal(0, 2)\]</p>: On the logit scale.</li><li><p class="math-container">\[μ0, μ1 ~ Normal(0, 1)\]</p>: On the logit scale. Assign maximum mass to the middle of the choices.</li><li><p class="math-container">\[ϕ0, ϕ1 ~ Normal(0, 1)\]</p>: On the log scale. Assign maximum mass to 1 after exponential transformation (flat distribution).</li><li><p class="math-container">\[p_mid ~ Normal(-3, 1)\]</p>: On the logit scale.  Assign more mass to low probabilities of mid-point responses.</li><li><p class="math-container">\[ϕ_mid ~ Gamma(22, 0.22)\]</p>: On the log scale. Gamma distribution (&gt; 0) that prevents any values below 1 (which would lead to an unidentifiable distribution). A <span>$Gamma(22, 0.22)$</span> that has a mode of ~100 after exponential transformation is an alternative in case truncated priors are not supported.</li><li><p class="math-container">\[k0 ~ -Gamma(3, 3)\]</p>:  On the logit scale. Prevents values below 0.5 (after logistic transformation).</li><li><p class="math-container">\[k1 ~ Gamma(3, 3)\]</p>: On the logit scale. Prevents values above 0.5 (after logistic transformation).</li></ul></div></div><details><summary>See code</summary><pre><code class="language-julia hljs">p1 =  Normal(0, 2.0)
+hist(y, bins=beta_bins(31),  normalization=:pdf, color=:darkblue)</code></pre><img src="4e4b1039.png" alt="Example block output"/><h3 id="Prior-Specification-2"><a class="docs-heading-anchor" href="#Prior-Specification-2">Prior Specification</a><a class="docs-heading-anchor-permalink" href="#Prior-Specification-2" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>We recommend the following priors:</p><ul><li><strong>p1 ~ Normal(0, 2)</strong>: On the logit scale.</li><li><strong>μ0, μ1 ~ Normal(0, 1)</strong>: On the logit scale. Assign maximum mass to the middle of the choices.</li><li><strong>ϕ0, ϕ1 ~ Normal(0, 1)</strong>: On the log scale. Assign maximum mass to 1 after exponential transformation (flat distribution).</li><li><strong>p_mid ~ Normal(-3, 1)</strong>: On the logit scale.  Assign more mass to low probabilities of mid-point responses.</li><li><strong>ϕ_mid ~ Gamma(22, 0.22)</strong>: On the log scale. Gamma distribution (&gt; 0) that prevents any values below 1 (which would lead to an unidentifiable distribution). A <strong>Gamma(22, 0.22)</strong> that has a mode of ~100 after exponential transformation is an alternative in case truncated priors are not supported.</li><li><strong>k0 ~ -Gamma(3, 3)</strong>:  On the logit scale. Prevents values below 0.5 (after logistic transformation).</li><li><strong>k1 ~ Gamma(3, 3)</strong>: On the logit scale. Prevents values above 0.5 (after logistic transformation).</li></ul></div></div><details><summary>See code</summary><pre><code class="language-julia hljs">p1 =  Normal(0, 2.0)
 μ0 = Normal(0, 1.0)
 μ1 = Normal(0, 1.0)
 ϕ0 = Normal(0, 1.0)
@@ -278,4 +277,64 @@ lines!(ax12, logistic.(xaxis2), pdf.(k1, xaxis2), color=:orange, linewidth=2, la
 
 
 fig[0, :] = Label(fig, &quot;Recommended Priors for Choco Models&quot;, fontsize=20, color=:black, font=:bold)
-fig;</code></pre><img src="a0b69124.png" alt="Example block output"/></details><img src="a0b69124-001.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../OrderedBeta/">« Ordered Beta Regressions</a><a class="docs-footer-nextpage" href="../api/">Other Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Friday 2 August 2024 10:31">Friday 2 August 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig;</code></pre><img src="a0b69124.png" alt="Example block output"/></details><img src="a0b69124-001.png" alt="Example block output"/><h3 id="Bayesian-Full-Choco-Model-with-Turing"><a class="docs-heading-anchor" href="#Bayesian-Full-Choco-Model-with-Turing">Bayesian Full Choco Model with Turing</a><a id="Bayesian-Full-Choco-Model-with-Turing-1"></a><a class="docs-heading-anchor-permalink" href="#Bayesian-Full-Choco-Model-with-Turing" title="Permalink"></a></h3><pre><code class="language-julia hljs">@model function model_choco(y)
+    p1 ~ Normal(0, 2)
+    μ0 ~ Normal(0, 1)
+    μ1 ~ Normal(0, 1)
+    ϕ0 ~ Normal(0, 1)
+    ϕ1 ~ Normal(0, 1)
+    # p_mid ~ Normal(-3, 1)
+    # ϕ_mid ~ truncated(Normal(5, 0.5); lower=0)
+    k0 ~ -Gamma(3, 3)
+    k1 ~ Gamma(3, 3)
+
+    for i in 1:length(y)
+        y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1), 0.0, 200, logistic(k0), logistic(k1))
+    end
+end
+
+fit_choco = model_choco(y)
+posteriors = sample(fit_choco, NUTS(), 500,
+    initial_params=[0, 0, 0, 0, 0, -9, 9])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Chains MCMC chain (500×19×1 Array{Float64, 3}):
+
+Iterations        = 251:1:750
+Number of chains  = 1
+Samples per chain = 500
+Wall duration     = 130.35 seconds
+Compute duration  = 130.35 seconds
+parameters        = p1, μ0, μ1, ϕ0, ϕ1, k0, k1
+internals         = lp, n_steps, is_accept, acceptance_rate, log_density, hamiltonian_energy, hamiltonian_energy_error, max_hamiltonian_energy_error, tree_depth, numerical_error, step_size, nom_step_size
+
+Summary Statistics
+ <span class="sgr1"> parameters </span> <span class="sgr1">    mean </span> <span class="sgr1">     std </span> <span class="sgr1">    mcse </span> <span class="sgr1"> ess_bulk </span> <span class="sgr1"> ess_tail </span> <span class="sgr1">    rhat </span> <span class="sgr1"> e</span> ⋯
+ <span class="sgr90">     Symbol </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90">  Float64 </span> <span class="sgr90">  Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90">  </span> ⋯
+
+          p1   -0.7209    0.0192    0.0007   666.2277   397.1099    1.0010     ⋯
+          μ0    0.2251    0.0144    0.0007   455.4114   407.5449    1.0002     ⋯
+          μ1   -0.7968    0.0197    0.0010   391.1751   277.0038    1.0007     ⋯
+          ϕ0   -0.0541    0.0170    0.0005   959.6954   414.3766    0.9999     ⋯
+          ϕ1    0.2467    0.0226    0.0010   453.9297   400.7875    0.9994     ⋯
+          k0   -1.7449    0.0337    0.0017   389.9230   428.3560    1.0065     ⋯
+          k1    2.8864    0.1079    0.0040   709.9375   424.5612    1.0113     ⋯
+<span class="sgr36">                                                                1 column omitted</span>
+
+Quantiles
+ <span class="sgr1"> parameters </span> <span class="sgr1">    2.5% </span> <span class="sgr1">   25.0% </span> <span class="sgr1">   50.0% </span> <span class="sgr1">   75.0% </span> <span class="sgr1">   97.5% </span>
+ <span class="sgr90">     Symbol </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span>
+
+          p1   -0.7580   -0.7349   -0.7200   -0.7067   -0.6834
+          μ0    0.1952    0.2160    0.2250    0.2353    0.2523
+          μ1   -0.8369   -0.8096   -0.7986   -0.7843   -0.7576
+          ϕ0   -0.0851   -0.0659   -0.0539   -0.0422   -0.0228
+          ϕ1    0.2067    0.2312    0.2464    0.2624    0.2921
+          k0   -1.8111   -1.7652   -1.7449   -1.7230   -1.6789
+          k1    2.6866    2.8097    2.8901    2.9571    3.1058
+</code></pre><p>Making inference on <em>p_mid</em> and <em>ϕ_mid</em> is challenging and requires a lot of data. It currently <strong>fails</strong> if we set <em>p_mid</em> to anything else than zero.</p><pre><code class="language-julia hljs"># Make predictions
+pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
+pred = Array(pred)
+
+fig = hist(y, bins=beta_bins(31), color=:darkblue, normalization=:pdf)
+for i in 1:size(pred, 1) # Iterate over each draw
+    hist!(pred[i, :], bins=beta_bins(31), color=(:darkorange, 0.01), normalization=:pdf)
+end
+fig</code></pre><img src="372d8596.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../OrderedBeta/">« Ordered Beta Regressions</a><a class="docs-footer-nextpage" href="../api/">Other Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Friday 2 August 2024 12:22">Friday 2 August 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
