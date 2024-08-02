@@ -2,6 +2,7 @@
     @test begin
         # using Test
         using Distributions
+        using Random
 
         x = range(0, 1, length=10)
         logpdf.(OrderedBeta(0.5, 3, 0, 1), x) == logpdf.(BetaPhi2(0.5, 3), x)
@@ -15,6 +16,31 @@
 
         logpdf(0.5 * OrderedBeta(0.5, 3, 0, 1), 0) ≈ -Inf
         floor(logpdf(0.5 * OrderedBeta(0.5, 3, 0.1, 1), 0); digits=5) ≈ -1.60944
+
+        # Logpdf
+        floor(logpdf(OrderedBeta(0.5, 3, 0, 1), 0.3); digits=5) ≈ 0.2799
+        floor(logpdf(OrderedBeta(0.5, 3, 0.1, 1), 0.3); digits=5) ≈ 0.17454
+        floor(logpdf(OrderedBeta(0.5, 3, 0, 0.9), 0.3); digits=5) ≈ 0.17454
+        floor(logpdf(OrderedBeta(0.5, 3, 0.1, 0.9), 0.3); digits=5) ≈ 0.05675
+
+        # Random
+        @testset "Random" begin
+            x = rand(MersenneTwister(1234), OrderedBeta(0.5, 1.0, 0.0, 0.85), 100_000)
+            @test sum(x .== 0) == 0
+            @test sum(x .== 1) / length(x) - pdf(OrderedBeta(0.5, 1, 0, 0.85), 1) < 0.01
+        end
+
+        dist_zero = OrderedBeta(μ, ϕ, 0.0, k1)
+        dist_one = OrderedBeta(μ, ϕ, k0, 1.0)
+        dist_both = OrderedBeta(μ, ϕ, 0.0, 1.0)
+
+        sample_zero = rand(dist_zero)
+        sample_one = rand(dist_one)
+        sample_both = rand(dist_both)
+
+        @test 0 <= sample_zero <= 1
+        @test 0 <= sample_one <= 1
+        @test 0 <= sample_both <= 1
 
 
 
@@ -32,13 +58,6 @@
         floor(pdf.(OrderedBeta(0.5, 1, _logistic(0), _logistic(2)), 1); digits=6) ≈ 0.119202
         # ordbetareg::dordbeta(c(0.5), mu = 0.5, phi = 4, cutpoints = c(0.5, -0.5), log = FALSE)
         pdf(OrderedBeta(0.5, 1, _logistic(0.5), _logistic(-0.5)), 0.5) ≈ 0 # Note: R outputs -0.367378
-
-        # Test random
-        # using CairoMakie
-        # d = OrderedBeta(0.5, 3, _logistic(-1), _logistic(1))
-        # fig = hist(rand(d, 1000), color=:forestgreen, normalization=:pdf, bins=10)
-        # lines!(range(0, 1, length=1000), pdf.(d, range(0, 1, length=1000)), color=:red)
-        # fig
 
     end
 end

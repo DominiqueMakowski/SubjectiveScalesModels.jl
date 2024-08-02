@@ -67,7 +67,7 @@ ax2 = Axis(
 )
 ylims!(ax2; low=0)
 
-xaxis = range(0, 1, length=10_000)
+xaxis = collect(range(0, 1, length=10_000))
 hist!(ax2, @lift(rand(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1), 10_000)), bins=50, color=:dimgrey, normalization=:pdf)
 lines!(ax2, xaxis, @lift(pdf.(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1), xaxis)), color=:darkorange, linewidth=3)
 
@@ -99,7 +99,7 @@ function make_animation(frame)
         ϕ1[] = change_param(frame; frame_range=(0.7, 0.9), param_range=(3.0, 1.0))
         p1[] = change_param(frame; frame_range=(0.7, 0.9), param_range=(0.9, 0.5))
     end
-    ylims!(ax1; low=0)
+    ylims!(ax2; low=0)
 end
 
 # animation settings
@@ -135,8 +135,8 @@ ax1 = Axis(
 ylims!(ax1; low=0)
 
 xaxis = range(0, 1, length=10_000)
-hist!(ax1, @lift(rand(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1, $p_mid, $ϕ_mid), 10_000)), bins=50, color=:dimgrey, normalization=:pdf)
-lines!(ax1, xaxis, @lift(pdf.(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1, $p_mid, $ϕ_mid), xaxis)), color=:crimson, linewidth=3)
+hist!(ax1, @lift(rand(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1, $p_mid, $ϕ_mid, 0, 1), 10_000)), bins=50, color=:dimgrey, normalization=:pdf)
+lines!(ax1, xaxis, @lift(pdf.(Choco($p1, $μ0, $ϕ0, $μ1, $ϕ1, $p_mid, $ϕ_mid, 0, 1), xaxis)), color=:crimson, linewidth=3)
 
 fig
 

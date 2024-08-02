@@ -2,7 +2,7 @@
 
 A **Choice-Confidence** scale is a subjective scale in which the left and right halves can be conceptualized as **two different choices** (e.g., True/False, Agree/Disagree, etc.), and the **magnitude** of the response (how much the cursor is set towards he extremes) as the **confidence** in the corresponding choice.
 
-This type of data can be modeled using a "Choice-Confidence" model consisting of a mixture of two scaled $Beta$ distributions expressing the confidence for each choice, each choice occurring with a certain probability (*p0* and *p1*). 
+This type of data can be modeled using a "Choice-Confidence" model consisting of a mixture of two scaled Ordered Beta distributions (see [`OrderedBeta`](@ref)) expressing the confidence for each choice, each choice occurring with a certain probability (*p0* and *p1*). 
 This model assumes that participant's behaviour when faced with a scale with a psychologically distinct left and right halves can be conceptualized as a decision between two discrete categories associated to a degree confidence in that choice (rather than a continuous degree of one category - e.g., "Agreement" - as assumed with regular *Beta* models).
 
 ![](https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/main/docs/img/choco_illustration.png?raw=true)
@@ -32,14 +32,12 @@ using Turing
 using CairoMakie
 using StatsFuns: logistic
 using SubjectiveScalesModels
-```
 
-```@example choco1
 Random.seed!(123)
 
 y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2), 10000)
 
-hist(y, bins=100,  normalization=:pdf, color=:darkorange)
+hist(y, bins=beta_bins(30),  normalization=:pdf, color=:darkorange)
 ```
 
 ### Prior Specification
@@ -62,7 +60,7 @@ p1 =  Normal(0, 2.0)
 μ0 = Normal(0, 1.0)
 μ1 = Normal(0, 0.8)
 ϕ0 = Normal(0, 1.0)
-ϕ1 = Normal(0, 0.5)
+ϕ1 = Normal(0, 1.2)
 
 fig =  Figure(size = (850, 600))
 
@@ -110,7 +108,7 @@ ax5 = Axis(fig[3, 1],
     xticksvisible=false,
     yticklabelsvisible=false)
 lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0 ~ Normal(0, 1)")
-lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 0.5)")
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1 ~ Normal(0, 1.2)")
 axislegend(ax5; position=:rt)
 
 ax6 = Axis(fig[3, 2], 
@@ -143,15 +141,15 @@ fig  # hide
     μ0 ~ Normal(0, 1)
     μ1 ~ Normal(0, 0.8)
     ϕ0 ~ Normal(0, 1)
-    ϕ1 ~ Normal(0, 0.5)
+    ϕ1 ~ Normal(0, 1.2)
 
     for i in 1:length(y)
         y[i] ~ Choco(logistic(p1), logistic(μ0), exp(ϕ0), logistic(μ1), exp(ϕ1))
     end
 end
 
-fit = model_choco(y)
-posteriors = sample(fit, NUTS(), 500)
+fit_choco = model_choco(y)
+posteriors = sample(fit_choco, NUTS(), 500)
 
 # 95% CI
 hpd(posteriors)
@@ -164,7 +162,7 @@ Let us do a **Posterior Predictive Check** which involves the generation of pred
 pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
 pred = Array(pred)
 
-fig = hist(y, bins=100, color=:darkorange, normalization=:pdf)
+fig = hist(y, bins=beta_bins(30), color=:darkorange, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
     density!(pred[i, :], color=(:black, 0), strokecolor=(:dodgerblue, 0.05), strokewidth=1)
 end
