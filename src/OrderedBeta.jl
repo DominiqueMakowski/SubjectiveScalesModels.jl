@@ -68,23 +68,23 @@ Distributions.minimum(::OrderedBeta) = 0
 Distributions.maximum(::OrderedBeta) = 1
 Distributions.insupport(::OrderedBeta, x::Real) = 0 ≤ x ≤ 1
 
-# function Distributions.mean(d::OrderedBeta)
-#     μ, ϕ, k0, k1 = Distributions.params(d)
-#     mu_ql = _logit(μ)
-#     k0_logit = _logit(k0)
-#     k1_logit = _logit(k1)
+function Distributions.mean(d::OrderedBeta)
+    μ, ϕ, k0, k1 = Distributions.params(d)
 
-#     # Probabilities for 0, 1, and (0, 1)
-#     p_0 = 1 - _logistic(mu_ql - k0_logit)
-#     p_1 = _logistic(mu_ql - k1_logit)
-#     p_middle = _logistic(mu_ql - k0_logit) - _logistic(mu_ql - k1_logit)
+    # Compute probabilities
+    p0 = 0.0
+    p1 = 0.0
+    if k0 >= eps()
+        p0 = 1 - _logistic(_logit(μ) - _logit(k0))
+    end
+    if k1 <= 1 - eps()
+        p1 = _logistic(_logit(μ) - _logit(k1))
+    end
+    pmiddle = 1 - p0 - p1
 
-#     # Mean of the Beta distribution
-#     beta_mean = μ
-
-#     # Weighted mean
-#     return p_0 * 0 + p_middle * beta_mean + p_1 * 1
-# end
+    # Weighted mean
+    return p0 * 0 + pmiddle * μ + p1 * 1
+end
 
 # function Distributions.var(d::OrderedBeta)
 #     μ, ϕ, k0, k1 = Distributions.params(d)

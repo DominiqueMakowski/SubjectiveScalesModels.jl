@@ -4,6 +4,10 @@
         using Distributions
         using Random
 
+        # Mean
+        mean(OrderedBeta(0.5, 3, 0.1, 1)) - mean(rand(OrderedBeta(0.5, 3, 0.1, 1), 100_000)) < 0.01
+
+        # Shifted
         x = range(0, 1, length=10)
         logpdf.(OrderedBeta(0.5, 3, 0, 1), x) == logpdf.(BetaPhi2(0.5, 3), x)
         logpdf(OrderedBeta(0.5, 3, 0, 1), 0.3) == logpdf(1 + OrderedBeta(0.5, 3, 0, 1), 1.3)
