@@ -40,7 +40,7 @@ k0 = 0.05
 k1 = 0.9
 
 data = rand(OrderedBeta(μ, ϕ, k0, k1), 1000)
-hist(data, color=:forestgreen, normalization=:pdf, bins=beta_bins(30))
+hist(data, color=:forestgreen, normalization=:pdf, bins=beta_bins(20))
 ```
 
 ### Prior Specification 
