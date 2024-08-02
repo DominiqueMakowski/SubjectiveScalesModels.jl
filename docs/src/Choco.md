@@ -30,12 +30,12 @@ using DataFrames
 using Random
 using Turing
 using CairoMakie
-using StatsFuns: logistic
+using StatsFuns
 using SubjectiveScalesModels
 
 Random.seed!(123)
 
-y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2), 10000)
+y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2), 1000)
 
 hist(y, bins=beta_bins(30),  normalization=:pdf, color=:darkorange)
 ```
@@ -121,7 +121,7 @@ lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="�
 lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linewidth=2, label="ϕ1")
 xlims!(ax6, 0, 10)
 
-fig[0, :] = Label(fig, "Priors for Choco Models", fontsize=20, color=:black, font=:bold)
+fig[0, :] = Label(fig, "Priors Example for Choco Models", fontsize=20, color=:black, font=:bold)
 fig;
 ```
 ```@raw html
@@ -191,4 +191,179 @@ results = DataFrame(
 )
 
 results
+```
+
+
+## Full Choco (with zero, half and one inflation) 
+
+```@example choco2
+using DataFrames
+using Random
+using Turing
+using CairoMakie
+using StatsFuns
+using SubjectiveScalesModels
+
+Random.seed!(123)
+
+y = rand(Choco(p1=0.3, μ0=0.7, ϕ0=3, μ1=0.4, ϕ1=2, p_mid=0.15, ϕ_mid=200, k0=0.1, k1=0.95), 10_000)
+
+hist(y, bins=beta_bins(31),  normalization=:pdf, color=:darkblue)
+```
+
+### Prior Specification
+
+!!! tip "Summary"
+    We recommend the following priors:
+    - $p1 ~ Normal(0, 2)$: On the logit scale.
+    - $μ0, μ1 ~ Normal(0, 1)$: On the logit scale. Assign maximum mass to the middle of the choices.
+    - $ϕ0, ϕ1 ~ Normal(0, 1)$: On the log scale. Assign maximum mass to 1 after exponential transformation (flat distribution).
+    - $p_mid ~ Normal(-3, 1)$: On the logit scale.  Assign more mass to low probabilities of mid-point responses.
+    - $ϕ_mid ~ Gamma(22, 0.22)$: On the log scale. Gamma distribution (> 0) that prevents any values below 1 (which would lead to an unidentifiable distribution). A $Gamma(22, 0.22)$ that has a mode of ~100 after exponential transformation is an alternative in case truncated priors are not supported.
+    - $k0 ~ -Gamma(3, 3)$:  On the logit scale. Prevents values below 0.5 (after logistic transformation).
+    - $k1 ~ Gamma(3, 3)$: On the logit scale. Prevents values above 0.5 (after logistic transformation).
+
+```@raw html
+<details><summary>See code</summary>
+```
+
+```@example choco2
+p1 =  Normal(0, 2.0)
+μ0 = Normal(0, 1.0)
+μ1 = Normal(0, 1.0)
+ϕ0 = Normal(0, 1.0)
+ϕ1 = Normal(0, 1.0)
+p_mid = Normal(-3, 1.0)
+ϕ_mid = truncated(Normal(5, 0.5); lower=0)
+ϕ_mid2 = Gamma(22, 0.22)
+
+k0 = -Gamma(3, 3)
+k1 = Gamma(3, 3)
+
+fig =  Figure(size = (1000, 1000))
+
+ax1 = Axis(fig[1, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+
+xaxis1 = range(-10, 10, 1000)
+
+lines!(ax1, xaxis1, pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1 ~ Normal(0, 2)")
+axislegend(ax1; position=:rt)
+
+ax2 = Axis(fig[1, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax2, logistic.(xaxis1), pdf.(p1, xaxis1), color=:purple, linewidth=2, label="p1")
+
+ax3 = Axis(fig[2, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax3, xaxis1, pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0 ~ Normal(0, 1)")
+lines!(ax3, xaxis1, pdf.(μ1, xaxis1), color=:red, linewidth=2, linestyle=:dash, label="μ1 ~ Normal(0, 1)")
+axislegend(ax3; position=:rt)
+
+ax4 = Axis(fig[2, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax4, logistic.(xaxis1), pdf.(μ0, xaxis1), color=:blue, linewidth=2, label="μ0")
+lines!(ax4, logistic.(xaxis1), pdf.(μ1, xaxis1), color=:red, linestyle=:dash, linewidth=2, label="μ1")
+
+ax5 = Axis(fig[3, 1], 
+    xlabel="Prior on the log scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax5, xaxis1, pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0 ~ Normal(0, 1)")
+lines!(ax5, xaxis1, pdf.(ϕ1, xaxis1), color=:orange, linestyle=:dash, linewidth=2, label="ϕ1 ~ Normal(0, 1)")
+axislegend(ax5; position=:rt)
+
+ax6 = Axis(fig[3, 2], 
+    xlabel="Prior after exponential transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax6, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax6, exp.(xaxis1), pdf.(ϕ0, xaxis1), color=:green, linewidth=2, label="ϕ0")
+lines!(ax6, exp.(xaxis1), pdf.(ϕ1, xaxis1), color=:orange, linestyle=:dash, linewidth=2, label="ϕ1")
+xlims!(ax6, 0, 10)
+
+ax7 = Axis(fig[4, 1], 
+    xlabel="Prior on the logit scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax7, xaxis1, pdf.(p_mid, xaxis1), color=:brown, linewidth=2, label="p_mid ~ Normal(-3, 1)")
+axislegend(ax7; position=:rt)
+
+ax8 = Axis(fig[4, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax8, logistic.(xaxis1), pdf.(p_mid, xaxis1), color=:brown, linewidth=2, label="p_mid")
+
+ax9 = Axis(fig[5, 1], 
+    xlabel="Prior on the log scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax9, xaxis1, pdf.(ϕ_mid, xaxis1), color=:brown, linewidth=2, label="ϕ_mid ~ truncated(Normal(5, 0.5); lower=0)")
+lines!(ax9, xaxis1, pdf.(ϕ_mid2, xaxis1), color=:orange, linestyle=:dash, linewidth=2, label="ϕ_mid ~ Gamma(22, 0.22)")
+axislegend(ax9; position=:lt)
+
+ax10 = Axis(fig[5, 2], 
+    xlabel="Prior after exponential transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax10, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax10, exp.(xaxis1), pdf.(ϕ_mid, xaxis1), color=:brown, linewidth=2, label="ϕ_mid")
+lines!(ax10, exp.(xaxis1), pdf.(ϕ_mid2, xaxis1), color=:orange, linestyle=:dash, linewidth=2, label="ϕ_mid")
+xlims!(ax10, 0, 300)
+
+xaxis2 = range(-20, 20, 10_000)
+ax11 = Axis(fig[6, 1], 
+    xlabel="Prior on the log scale",
+    ylabel="Distribution",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+lines!(ax11, xaxis2, pdf.(k0, xaxis2), color=:purple, linewidth=2, label="k0 ~ -Gamma(3, 3)")
+lines!(ax11, xaxis2, pdf.(k1, xaxis2), color=:orange, linewidth=2, label="k1 ~ Gamma(3, 3)")
+axislegend(ax11; position=:rt)
+xlims!(ax11, -20, 20)
+
+ax12 = Axis(fig[6, 2], 
+    xlabel="Prior after logistic transformation",
+    yticksvisible=false,
+    xticksvisible=false,
+    yticklabelsvisible=false)
+vlines!(ax12, [1], color=:black, linestyle=:dash, linewidth=1)
+lines!(ax12, logistic.(xaxis2), pdf.(k0, xaxis2), color=:purple, linewidth=2, label="k0")
+lines!(ax12, logistic.(xaxis2), pdf.(k1, xaxis2), color=:orange, linewidth=2, label="k1")
+
+
+fig[0, :] = Label(fig, "Recommended Priors for Choco Models", fontsize=20, color=:black, font=:bold)
+fig;
+```
+```@raw html
+</details>
+```
+
+```@example choco2
+fig  # hide
 ```
