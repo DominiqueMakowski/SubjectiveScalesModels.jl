@@ -39,7 +39,17 @@ In the case of responses clustered in the middle of the scale (at 0.5), in this 
 # Examples
 ```jldoctest
 julia> Choco(p1=0.5, μ0=0.7, ϕ0=2, μ1=0.7, ϕ1=2)
-Choco{Float64}(p1=0.5, μ0=0.7, ϕ0=2.0, μ1=0.7, ϕ1=2.0, p_mid=0.0, ϕ_mid=100.0)
+Choco{Float64}(
+p1: 0.5
+μ0: 0.7
+ϕ0: 2.0
+μ1: 0.7
+ϕ1: 2.0
+p_mid: 0.0
+ϕ_mid: 100.0
+k0: 0.0
+k1: 1.0
+)
 ```
 """
 struct Choco{T<:Real} <: Distributions.ContinuousUnivariateDistribution
