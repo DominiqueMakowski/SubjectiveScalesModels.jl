@@ -167,7 +167,7 @@ function Distributions.logpdf(d::OrderedBeta, x::Real)
         if pmiddle < 0
             return -Inf
         end
-        return log(pmiddle) + logpdf(BetaPhi2(μ, ϕ), x)
+        return log(pmiddle) + Distributions.logpdf(BetaPhi2(μ, ϕ), x)
     else
         return -Inf
     end
