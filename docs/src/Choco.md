@@ -387,8 +387,7 @@ fig  # hide
 end
 
 fit_choco = model_choco(y)
-posteriors = sample(fit_choco, NUTS(), 500,
-    initial_params=[0, 0, 0, 0, 0, -9, 9])
+posteriors = sample(fit_choco, NUTS(), 500)
 ```
 
 Making inference on *p_mid* and *ϕ_mid* is challenging and requires a lot of data.

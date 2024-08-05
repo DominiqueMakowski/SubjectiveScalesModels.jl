@@ -1,9 +1,7 @@
-using Distributions
-using Random
+import Distributions
+import Random
+import StatsFuns: logistic, logit
 
-# Internal definitions
-@inline _logistic(x::Real) = 1 / (1 + exp(-x))
-@inline _logit(x::Real) = log(x / (1 - x))
 
 """
     OrderedBeta(μ, ϕ, k0, k1)
@@ -75,10 +73,10 @@ function Distributions.mean(d::OrderedBeta)
     p0 = 0.0
     p1 = 0.0
     if k0 >= eps()
-        p0 = 1 - _logistic(_logit(μ) - _logit(k0))
+        p0 = 1 - logistic(logit(μ) - logit(k0))
     end
     if k1 <= 1 - eps()
-        p1 = _logistic(_logit(μ) - _logit(k1))
+        p1 = logistic(logit(μ) - logit(k1))
     end
     pmiddle = 1 - p0 - p1
 
@@ -88,14 +86,14 @@ end
 
 # function Distributions.var(d::OrderedBeta)
 #     μ, ϕ, k0, k1 = Distributions.params(d)
-#     mu_ql = _logit(μ)
-#     k0_logit = _logit(k0)
-#     k1_logit = _logit(k1)
+#     mu_ql = logit(μ)
+#     k0logit = logit(k0)
+#     k1logit = logit(k1)
 
 #     # Probabilities for 0, 1, and (0, 1)
-#     p_0 = 1 - _logistic(mu_ql - k0_logit)
-#     p_1 = _logistic(mu_ql - k1_logit)
-#     p_middle = _logistic(mu_ql - k0_logit) - _logistic(mu_ql - k1_logit)
+#     p_0 = 1 - logistic(mu_ql - k0logit)
+#     p_1 = logistic(mu_ql - k1logit)
+#     p_middle = logistic(mu_ql - k0logit) - logistic(mu_ql - k1logit)
 
 #     # Parameters of the Beta distribution using BetaPhi2
 #     beta_dist = BetaPhi2(μ, ϕ)
@@ -122,10 +120,10 @@ function Random.rand(rng::Random.AbstractRNG, d::OrderedBeta)
     p0 = 0.0
     p1 = 0.0
     if k0 >= eps()
-        p0 = 1 - _logistic(_logit(μ) - _logit(k0))
+        p0 = 1 - logistic(logit(μ) - logit(k0))
     end
     if k1 <= 1 - eps()
-        p1 = _logistic(_logit(μ) - _logit(k1))
+        p1 = logistic(logit(μ) - logit(k1))
     end
     pmiddle = 1 - p0 - p1
 
@@ -153,10 +151,10 @@ function Distributions.logpdf(d::OrderedBeta, x::Real)
     p0 = 0.0
     p1 = 0.0
     if k0 >= eps()
-        p0 = 1 - _logistic(_logit(μ) - _logit(k0))
+        p0 = 1 - logistic(logit(μ) - logit(k0))
     end
     if k1 <= 1 - eps()
-        p1 = _logistic(_logit(μ) - _logit(k1))
+        p1 = logistic(logit(μ) - logit(k1))
     end
 
     # Compute logpdf
@@ -182,17 +180,17 @@ Distributions.loglikelihood(d::OrderedBeta, x::Real) = Distributions.logpdf(d, x
 
 # function Distributions.cdf(d::OrderedBeta, x::Real)
 #     μ, ϕ, k0, k1 = Distributions.params(d)
-#     mu_ql = _logit(μ)
-#     k0_logit = _logit(k0)
-#     k1_logit = _logit(k1)
+#     mu_ql = logit(μ)
+#     k0logit = logit(k0)
+#     k1logit = logit(k1)
 
 #     if x <= 0
 #         return zero(μ)
 #     elseif x >= 1
 #         return one(μ)
 #     else
-#         p_0 = 1 - _logistic(mu_ql - k0_logit)
-#         p_middle = _logistic(mu_ql - k0_logit) - _logistic(mu_ql - k1_logit)
+#         p_0 = 1 - logistic(mu_ql - k0logit)
+#         p_middle = logistic(mu_ql - k0logit) - logistic(mu_ql - k1logit)
 #         return p_0 + p_middle * Distributions.cdf(BetaPhi2(μ, ϕ), x)
 #     end
 # end
@@ -200,19 +198,19 @@ Distributions.loglikelihood(d::OrderedBeta, x::Real) = Distributions.logpdf(d, x
 # function Distributions.quantile(d::OrderedBeta, q::Real)
 #     0 <= q <= 1 || throw(DomainError(q, "quantile must be in [0, 1]"))
 #     μ, ϕ, k0, k1 = Distributions.params(d)
-#     mu_ql = _logit(μ)
-#     k0_logit = _logit(k0)
-#     k1_logit = _logit(k1)
+#     mu_ql = logit(μ)
+#     k0logit = logit(k0)
+#     k1logit = logit(k1)
 
-#     p_0 = 1 - _logistic(mu_ql - k0_logit)
-#     p_1 = _logistic(mu_ql - k1_logit)
+#     p_0 = 1 - logistic(mu_ql - k0logit)
+#     p_1 = logistic(mu_ql - k1logit)
 
 #     if q <= p_0
 #         return 0.0
 #     elseif q >= 1 - p_1
 #         return 1.0
 #     else
-#         p_middle = _logistic(mu_ql - k0_logit) - _logistic(mu_ql - k1_logit)
+#         p_middle = logistic(mu_ql - k0logit) - logistic(mu_ql - k1logit)
 #         q_adjusted = (q - p_0) / p_middle
 #         return Distributions.quantile(BetaPhi2(μ, ϕ), q_adjusted)
 #     end
