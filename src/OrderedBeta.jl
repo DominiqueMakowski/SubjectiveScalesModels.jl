@@ -40,7 +40,7 @@ OrderedBeta{Float64}(μ=0.5, ϕ=1.0, k0=0.1, k1=0.9)
 # References
 - Kubinec, R. (2023). Ordered beta regression: a parsimonious, well-fitting model for continuous data with lower and upper bounds. Political analysis, 31(4), 519-536.
 """
-struct OrderedBeta{T<:Real} <: ContinuousUnivariateDistribution
+struct OrderedBeta{T<:Real} <: Distributions.ContinuousUnivariateDistribution
     μ::T
     ϕ::T
     k0::T
