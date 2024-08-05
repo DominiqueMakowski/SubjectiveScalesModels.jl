@@ -10,7 +10,7 @@ p_mid: 0.0
 ϕ_mid: 100.0
 k0: 0.0
 k1: 1.0
-)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/16992efa8fea9555cc395d4b97eab002264e373f/src/Choco.jl#L5-L54">source</a></section></article><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><h3 id="Simulate-Data"><a class="docs-heading-anchor" href="#Simulate-Data">Simulate Data</a><a id="Simulate-Data-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-Data" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>You can use <code>rand(dist, n)</code> to generate <em>n</em> observations from a <code>Choco()</code> distribution with pre-specified parameters.</p></div></div><p>Let&#39;s generate some data from a <code>Choco()</code> distribution with known parameters that we are going to try to recover using Bayesian modelling.</p><pre><code class="language-julia hljs">using DataFrames
+)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/DominiqueMakowski/SubjectiveScalesModels.jl/blob/708ac32fbd89714a8e8c76f9595b7326e87d99c6/src/Choco.jl#L5-L54">source</a></section></article><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><h3 id="Simulate-Data"><a class="docs-heading-anchor" href="#Simulate-Data">Simulate Data</a><a id="Simulate-Data-1"></a><a class="docs-heading-anchor-permalink" href="#Simulate-Data" title="Permalink"></a></h3><div class="admonition is-success"><header class="admonition-header">Summary</header><div class="admonition-body"><p>You can use <code>rand(dist, n)</code> to generate <em>n</em> observations from a <code>Choco()</code> distribution with pre-specified parameters.</p></div></div><p>Let&#39;s generate some data from a <code>Choco()</code> distribution with known parameters that we are going to try to recover using Bayesian modelling.</p><pre><code class="language-julia hljs">using DataFrames
 using Random
 using Turing
 using CairoMakie
@@ -294,14 +294,13 @@ fig;</code></pre><img src="a0b69124.png" alt="Example block output"/></details><
 end
 
 fit_choco = model_choco(y)
-posteriors = sample(fit_choco, NUTS(), 500,
-    initial_params=[0, 0, 0, 0, 0, -9, 9])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Chains MCMC chain (500×19×1 Array{Float64, 3}):
+posteriors = sample(fit_choco, NUTS(), 500)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Chains MCMC chain (500×19×1 Array{Float64, 3}):
 
 Iterations        = 251:1:750
 Number of chains  = 1
 Samples per chain = 500
-Wall duration     = 134.5 seconds
-Compute duration  = 134.5 seconds
+Wall duration     = 121.52 seconds
+Compute duration  = 121.52 seconds
 parameters        = p1, μ0, μ1, ϕ0, ϕ1, k0, k1
 internals         = lp, n_steps, is_accept, acceptance_rate, log_density, hamiltonian_energy, hamiltonian_energy_error, max_hamiltonian_energy_error, tree_depth, numerical_error, step_size, nom_step_size
 
@@ -309,26 +308,26 @@ Summary Statistics
  <span class="sgr1"> parameters </span> <span class="sgr1">    mean </span> <span class="sgr1">     std </span> <span class="sgr1">    mcse </span> <span class="sgr1"> ess_bulk </span> <span class="sgr1"> ess_tail </span> <span class="sgr1">    rhat </span> <span class="sgr1"> e</span> ⋯
  <span class="sgr90">     Symbol </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90">  Float64 </span> <span class="sgr90">  Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90">  </span> ⋯
 
-          p1   -0.7209    0.0192    0.0007   666.2277   397.1099    1.0010     ⋯
-          μ0    0.2251    0.0144    0.0007   455.4114   407.5449    1.0002     ⋯
-          μ1   -0.7968    0.0197    0.0010   391.1751   277.0038    1.0007     ⋯
-          ϕ0   -0.0541    0.0170    0.0005   959.6954   414.3766    0.9999     ⋯
-          ϕ1    0.2467    0.0226    0.0010   453.9297   400.7875    0.9994     ⋯
-          k0   -1.7449    0.0337    0.0017   389.9230   428.3560    1.0065     ⋯
-          k1    2.8864    0.1079    0.0040   709.9375   424.5612    1.0113     ⋯
+          p1   -0.7214    0.0237    0.0011   508.3549   299.6594    1.0017     ⋯
+          μ0    0.2255    0.0150    0.0006   560.2960   409.3370    1.0184     ⋯
+          μ1   -0.7945    0.0201    0.0008   598.5849   332.6438    0.9983     ⋯
+          ϕ0   -0.0544    0.0161    0.0006   631.1050   372.2645    1.0008     ⋯
+          ϕ1    0.2457    0.0227    0.0009   656.1494   436.0858    1.0052     ⋯
+          k0   -1.7436    0.0351    0.0013   748.1021   510.8117    1.0006     ⋯
+          k1    2.8947    0.1170    0.0047   636.7414   408.3394    0.9993     ⋯
 <span class="sgr36">                                                                1 column omitted</span>
 
 Quantiles
  <span class="sgr1"> parameters </span> <span class="sgr1">    2.5% </span> <span class="sgr1">   25.0% </span> <span class="sgr1">   50.0% </span> <span class="sgr1">   75.0% </span> <span class="sgr1">   97.5% </span>
  <span class="sgr90">     Symbol </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span> <span class="sgr90"> Float64 </span>
 
-          p1   -0.7580   -0.7349   -0.7200   -0.7067   -0.6834
-          μ0    0.1952    0.2160    0.2250    0.2353    0.2523
-          μ1   -0.8369   -0.8096   -0.7986   -0.7843   -0.7576
-          ϕ0   -0.0851   -0.0659   -0.0539   -0.0422   -0.0228
-          ϕ1    0.2067    0.2312    0.2464    0.2624    0.2921
-          k0   -1.8111   -1.7652   -1.7449   -1.7230   -1.6789
-          k1    2.6866    2.8097    2.8901    2.9571    3.1058
+          p1   -0.7685   -0.7364   -0.7214   -0.7061   -0.6771
+          μ0    0.1950    0.2159    0.2252    0.2353    0.2536
+          μ1   -0.8353   -0.8073   -0.7949   -0.7820   -0.7549
+          ϕ0   -0.0870   -0.0639   -0.0543   -0.0438   -0.0229
+          ϕ1    0.2017    0.2301    0.2465    0.2618    0.2909
+          k0   -1.8056   -1.7676   -1.7437   -1.7212   -1.6734
+          k1    2.6736    2.8181    2.8928    2.9656    3.1305
 </code></pre><p>Making inference on <em>p_mid</em> and <em>ϕ_mid</em> is challenging and requires a lot of data. It currently <strong>fails</strong> if we set <em>p_mid</em> to anything else than zero.</p><pre><code class="language-julia hljs"># Make predictions
 pred = predict(model_choco([missing for _ in 1:length(y)]), posteriors)
 pred = Array(pred)
@@ -337,4 +336,4 @@ fig = hist(y, bins=beta_bins(31), color=:darkblue, normalization=:pdf)
 for i in 1:size(pred, 1) # Iterate over each draw
     hist!(pred[i, :], bins=beta_bins(31), color=(:darkorange, 0.01), normalization=:pdf)
 end
-fig</code></pre><img src="372d8596.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../OrderedBeta/">« Ordered Beta Regressions</a><a class="docs-footer-nextpage" href="../api/">Other Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Friday 2 August 2024 12:47">Friday 2 August 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="9c448149.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../OrderedBeta/">« Ordered Beta Regressions</a><a class="docs-footer-nextpage" href="../api/">Other Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Monday 5 August 2024 20:37">Monday 5 August 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
